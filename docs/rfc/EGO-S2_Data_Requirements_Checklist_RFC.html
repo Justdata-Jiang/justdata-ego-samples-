@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RFC 0.1 — Training-Grade Egocentric Data Requirements Checklist</title>
+<meta name="description" content="An open checklist of 54 questions that any egocentric data spec for embodied-AI training should answer. Draft for public comment.">
+<style>
+:root{
+  --ink:#1b2430; --muted:#6b7684; --line:#dde4ec; --bg:#f4f7fa; --card:#fff;
+  --brand:#1d4e79; --brand-soft:#eaf1f8; --ok:#2c7a58; --ok-soft:#e8f4ed;
+  --warn:#b3532c; --warn-soft:#fdf0e9; --hard:#a6302c; --hard-soft:#fbecec;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px 60px}
+a{color:var(--brand)}
+code{font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#eef2f7;
+  border:1px solid #e0e7ef;border-radius:3px;padding:0 4px}
+
+.toolbar{position:sticky;top:0;z-index:20;background:rgba(244,247,250,.96);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:22px}
+.toolbar .inner{max-width:1000px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.toolbar .tt{font-weight:700;color:var(--brand);margin-right:auto;font-size:14px}
+.prog{font-size:12px;color:var(--muted);margin-right:6px;white-space:nowrap}
+.bar{width:110px;height:6px;border-radius:4px;background:#dfe6ee;overflow:hidden;margin-right:10px}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+button{font:inherit;font-size:12.5px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;
+  background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--brand);color:var(--brand)}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+button.primary:hover{background:#163d5e;color:#fff}
+button.ghost{background:transparent}
+
+.hd{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px 26px;margin-bottom:16px}
+.eyebrow{font-size:11.5px;letter-spacing:.18em;color:var(--brand);font-weight:700;margin:0 0 6px}
+h1{font-size:26px;line-height:1.32;margin:0 0 8px;letter-spacing:-.02em}
+.hd .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+.status{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 18px;border-top:1px solid var(--line);padding-top:16px}
+.status .lb{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+.status .vl{font-size:13px;font-weight:600;color:var(--ink)}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--warn);
+  background:var(--warn-soft);border:1px solid #f0d6c6;border-radius:4px;padding:1px 7px}
+.note{background:var(--brand-soft);border-left:3px solid var(--brand);border-radius:0 6px 6px 0;
+  padding:12px 16px;margin-bottom:12px;font-size:12.8px;color:#33465b}
+.note b{color:var(--brand)}
+.note ul{margin:6px 0 0;padding-left:20px}
+.note li{margin:2px 0}
+.callout{background:#fff;border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:0 8px 8px 0;
+  padding:16px 20px;margin-bottom:18px}
+.callout h3{margin:0 0 8px;font-size:14.5px;color:var(--ok)}
+.callout p{font-size:12.8px;color:#3b4c60;margin:0 0 8px}
+.callout pre{background:#f7fafc;border:1px solid var(--line);border-radius:6px;padding:12px 14px;
+  font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:auto;margin:0 0 10px;color:#31465c}
+.callout ol{margin:0;padding-left:20px;font-size:12.6px;color:#3b4c60}
+.callout li{margin:2px 0}
+.callout code{font:12px ui-monospace,Menlo,monospace}
+
+.grp{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.grp>h2{display:flex;align-items:center;gap:10px;margin:0;padding:14px 20px;background:#f8fafc;
+  border-bottom:1px solid var(--line);font-size:15.5px;font-weight:700}
+.gn{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:6px;
+  background:var(--brand);color:#fff;font-size:13px;flex:0 0 auto}
+.grp>h2 em{font-style:normal;font-weight:400;font-size:12px;color:var(--muted);margin-left:auto;text-align:right}
+
+.q{padding:14px 20px 13px;border-bottom:1px dashed #e8edf3}
+.q:last-child{border-bottom:0}
+.qh{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+.qn{font-size:11.5px;font-weight:700;color:var(--brand);background:var(--brand-soft);
+  padding:1px 6px;border-radius:4px;flex:0 0 auto}
+.qt{font-weight:600;font-size:13.6px}
+.tag{font-size:10.5px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-left:2px}
+.tag.hard{color:var(--hard);border-color:#eccdcd;background:var(--hard-soft);font-weight:700}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:5px 12px}
+.opts.two{grid-template-columns:repeat(2,1fr)}
+.opt{display:flex;align-items:flex-start;gap:7px;font-size:12.8px;line-height:1.5;padding:3px 5px;
+  border-radius:5px;cursor:pointer;color:#33404f}
+.opt:hover{background:#f5f8fb}
+.opt input{margin:3px 0 0;flex:0 0 auto;width:14px;height:14px;accent-color:var(--brand);cursor:pointer}
+.rec{font-style:normal;font-size:10px;color:var(--ok);background:var(--ok-soft);border:1px solid #cfe7d9;
+  border-radius:3px;padding:0 4px;margin-left:4px;white-space:nowrap}
+.alert{font-style:normal;font-size:10px;color:var(--warn);background:var(--warn-soft);border:1px solid #f0d6c6;
+  border-radius:3px;padding:0 4px;margin-left:4px;white-space:nowrap}
+.other{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.other input{flex:1;max-width:420px;border:0;border-bottom:1px dashed #c9d4e0;padding:3px 2px;font:inherit;font-size:12.5px;outline:none;background:transparent}
+.hint{font-size:11.6px;color:var(--muted);margin-top:8px;padding-left:2px}
+.hint b{color:#46586c;font-weight:600}
+.hint .lb{display:inline-block;font-size:10.5px;border-radius:3px;padding:0 5px;margin-right:5px;font-weight:700}
+.lb.hard{background:var(--hard-soft);color:var(--hard);border:1px solid #eccdcd}
+.lb.tip{background:#eef2f7;color:#52657a;border:1px solid #dde5ee;font-weight:400}
+
+#summary{display:none;background:var(--card);border:2px solid var(--brand);border-radius:10px;padding:22px 24px;margin-bottom:16px}
+#summary h2{margin:0 0 6px;font-size:17px;color:var(--brand)}
+#summary .sd{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+#out{white-space:pre-wrap;font:12.4px/1.75 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:#f7fafc;border:1px solid var(--line);border-radius:6px;padding:16px;max-height:460px;overflow:auto}
+.srow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.missing{color:var(--warn);font-size:12.5px;margin:10px 0 0}
+
+.end{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin-top:16px}
+.end h2{font-size:16px;margin:0 0 10px;color:var(--brand)}
+.end p,.end li{font-size:12.8px;color:#3b4c60}
+.end ol{padding-left:20px;margin:6px 0 12px}
+.end pre{background:#f7fafc;border:1px solid var(--line);border-radius:6px;padding:12px 14px;
+  font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;overflow:auto;color:#31465c}
+.foot{text-align:center;font-size:11.5px;color:#93a0ae;padding:14px 0}
+
+@media (max-width:760px){
+  .opts{grid-template-columns:repeat(2,1fr)}
+  .status{grid-template-columns:repeat(2,1fr)}
+  .grp>h2 em{display:none}
+}
+@media print{
+  body{background:#fff;font-size:11.5px}
+  .wrap{max-width:none;padding:0}
+  .toolbar,#summary{display:none !important}
+  .hd,.grp,.end,.callout{border:1px solid #cfd8e2;border-radius:0;box-shadow:none;break-inside:avoid}
+  .hd{padding:16px 18px;margin-bottom:10px}
+  h1{font-size:20px}
+  .note,.callout{padding:9px 12px;margin-bottom:10px}
+  .grp{margin-bottom:10px}
+  .grp>h2{padding:9px 14px;background:#f2f6fa !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gn{background:#1d4e79 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .q{padding:9px 14px;break-inside:avoid}
+  .opts{gap:3px 10px}
+  .opt{font-size:11px;padding:1px 3px}
+  .opt input{width:11px;height:11px}
+  .hint{font-size:10px;margin-top:4px}
+  .rec,.alert,.tag,.lb,.pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar"><div class="inner">
+  <span class="tt">EGO-S2 · RFC 0.1</span>
+  <span class="prog" id="prog">0 / 0 ticked</span>
+  <span class="bar"><i id="barfill"></i></span>
+  <button onclick="fillRec()">Fill baselines</button>
+  <button onclick="clearAll()" class="ghost">Clear</button>
+  <button onclick="buildSummary()" class="primary">Copy summary</button>
+  <button onclick="window.print()">Print / PDF</button>
+</div></div>
+
+<div class="wrap">
+
+<div class="hd">
+  <p class="eyebrow">EGO-S2 · REQUEST FOR COMMENTS · RFC 0.1</p>
+  <h1>A Checklist for Training-Grade<br>Egocentric Data Requirements</h1>
+  <p class="sub">A public draft of the questions any egocentric-data spec for embodied-AI training should answer in writing. Open for comment — not a specification, not a contract.</p>
+  <div class="status">
+    <div><span class="lb">Status</span><span class="vl"><span class="pill">DRAFT</span> open for comment</span></div>
+    <div><span class="lb">Version</span><span class="vl">0.1 · 2026-11-10</span></div>
+    <div><span class="lb">Scope</span><span class="vl">9 sections · 54 items · 249 options</span></div>
+    <div><span class="lb">Discussion</span><span class="vl">GitHub Issues / Pull Requests</span></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Ground rules</b>
+  <ul>
+    <li><b>No pricing in this document.</b> Unit prices, volumes and payment terms are out of scope.</li>
+    <li>Options marked <i class="rec">baseline</i> are starting points for discussion, not requirements. Options marked <i class="alert">caveat</i> carry a known technical risk.</li>
+    <li>Items marked <span class="tag hard">Hard gate</span> are the ones believed impossible to trade away without changing what the data can be used for. Being proven wrong here is especially welcome.</li>
+    <li>Evidence is preferred: a paper, a datasheet, a measurement, or a deployment story.</li>
+  </ul>
+</div>
+
+<div class="callout">
+  <h3>How to contribute</h3>
+  <p>Copy the checklist into a new Issue and tick your answers with <code>- [x]</code>, or fork and open a PR to change an item, a threshold or the wording. One item per Issue is easiest to discuss — cite the item ID (e.g. <code>C1</code>). You can also use <b>Copy summary</b> above to paste a full configuration.</p>
+  <pre>Item: C1
+Position: Agree / Disagree / Needs a different threshold
+Evidence: (paper, datasheet, measurement, deployment experience)
+Use case: (what you are training, on which embodiment)
+Proposal: (the exact wording you would change it to)</pre>
+  <p style="margin:0 0 4px"><b>Where feedback is most wanted</b></p>
+  <ol>
+    <li><code>C1</code> — Is σ ≤ 100 µs the right gate, too strict, or too loose?</li>
+    <li><code>B9</code> — What bitrate is genuinely needed for stereo matching?</li>
+    <li><code>B2</code> — Is global shutter truly mandatory, or is lockstep rolling shutter enough?</li>
+    <li><code>B8</code> — Should depth always ship with a confidence mask?</li>
+    <li><code>A2</code> — Is a three-tier (L1 / L2 / L3) model useful, or over-complicated?</li>
+    <li><code>E2</code> — Are long-tail physical scenarios worth specifying at all?</li>
+    <li><code>F1</code> — MCAP as the single archival source of truth: right call?</li>
+  </ol>
+</div>
+
+<section class="grp" data-g="A" data-title="Purpose &amp; data tier">
+  <h2><span class="gn">A</span>Purpose &amp; data tier<em>Determines every default below.</em></h2>
+  <div class="q" data-q="A1">
+    <div class="qh"><span class="qn">A1</span><span class="qt">Where in the training pipeline will this data be used?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="A1" value="Pre-training / world models"> Pre-training / world models</label>
+      <label class="opt"><input type="checkbox" name="A1" value="Mid-training — action label generation" data-rec="1"> Mid-training — action label generation <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="A1" value="Post-training / real-robot alignment"> Post-training / real-robot alignment</label>
+      <label class="opt"><input type="checkbox" name="A1" value="Capability evaluation benchmark"> Capability evaluation benchmark</label>
+      <label class="opt"><input type="checkbox" name="A1" value="Specialist high-value skill data"> Specialist high-value skill data</label>
+      <label class="opt"><input type="checkbox" name="A1" value="Not decided yet / vendor to advise"> Not decided yet / vendor to advise</label>
+    </div>
+    <div class="other">Other / undecided: <input class="q-other" data-q="A1" placeholder="write here"></div>
+    <div class="hint"><span class="lb tip">Note</span>Pre-training rewards scale and diversity; action labels and evaluation reward geometric accuracy. These two routes need very different configurations.</div>
+  </div>
+  <div class="q" data-q="A2">
+    <div class="qh"><span class="qn">A2</span><span class="qt">Which data tier is being requested?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="A2" value="L1 Footage tier (video + basic metadata)"> L1 Footage tier (video + basic metadata)</label>
+      <label class="opt"><input type="radio" name="A2" value="L2 Training tier" data-rec="1"> L2 Training tier <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="A2" value="L3 Ground-truth / evaluation tier"> L3 Ground-truth / evaluation tier</label>
+      <label class="opt"><input type="radio" name="A2" value="Mixed procurement (L1 + L2)"> Mixed procurement (L1 + L2)</label>
+    </div>
+    <div class="other">Other: <input class="q-other" data-q="A2" placeholder="write here"></div>
+    <div class="hint"><span class="lb tip">Note</span>L3 requires per-device calibration, confidence masks and a downstream measured pass rate; acceptance criteria and price must be negotiated separately.</div>
+  </div>
+  <div class="q" data-q="A3">
+    <div class="qh"><span class="qn">A3</span><span class="qt">Where will the data go?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="A3" value="Internal R&amp;D use only" data-rec="1"> Internal R&amp;D use only <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="A3" value="External delivery / resale"> External delivery / resale</label>
+      <label class="opt"><input type="radio" name="A3" value="Both"> Both</label>
+      <label class="opt"><input type="radio" name="A3" value="Undecided"> Undecided</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>External delivery triggers the licensing chain, privacy redaction and compliance evidence. Internal use can be simplified — but is not exempt from consent.</div>
+  </div>
+  <div class="q" data-q="A4">
+    <div class="qh"><span class="qn">A4</span><span class="qt">Is there a confirmed downstream consumer (model team)?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="A4" value="Yes, with written format requirements"> Yes, with written format requirements</label>
+      <label class="opt"><input type="radio" name="A4" value="Interest only, format not fixed"> Interest only, format not fixed</label>
+      <label class="opt"><input type="radio" name="A4" value="None yet, use a general baseline"> None yet, use a general baseline</label>
+      <label class="opt"><input type="radio" name="A4" value="Need the provider to help broker this"> Need the provider to help broker this</label>
+    </div>
+    <div class="other">Downstream team / spec reference: <input class="q-other" data-q="A4" placeholder="write here"></div>
+    <div class="hint"><span class="lb hard">Hard gate</span>Starting volume production without a written format confirmation is the single most common cause of rework.</div>
+  </div>
+</section>
+<section class="grp" data-g="B" data-title="Vision &amp; imaging">
+  <h2><span class="gn">B</span>Vision &amp; imaging<em>Determines device selection, bandwidth and storage.</em></h2>
+  <div class="q" data-q="B1">
+    <div class="qh"><span class="qn">B1</span><span class="qt">View count and placement?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B1" value="Monocular"> Monocular</label>
+      <label class="opt"><input type="radio" name="B1" value="Stereo, head-mounted" data-rec="1"> Stereo, head-mounted <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B1" value="Stereo + wrist camera"> Stereo + wrist camera</label>
+      <label class="opt"><input type="radio" name="B1" value="Multi-camera array (3+ views)"> Multi-camera array (3+ views)</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Storage and wireless concurrency scale roughly linearly with view count. A wrist camera addresses physical occlusion at close range and usually returns more than adding head-mounted views.</div>
+  </div>
+  <div class="q" data-q="B2">
+    <div class="qh"><span class="qn">B2</span><span class="qt">Shutter type?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B2" value="Global shutter" data-rec="1"> Global shutter <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B2" value="Rolling shutter, with synchronised lockstep readout required"> Rolling shutter, with synchronised lockstep readout required</label>
+      <label class="opt"><input type="radio" name="B2" value="Hybrid: GS for geometry + RS for footage"> Hybrid: GS for geometry + RS for footage</label>
+      <label class="opt"><input type="radio" name="B2" value="Provider recommends per scenario"> Provider recommends per scenario</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>If 3D trajectories, metric depth or action labels are needed, GS is an entry requirement. Lockstep RS can save cost only for slow, well-lit footage. GS does not remove motion blur and does not by itself synchronise the two eyes.</div>
+  </div>
+  <div class="q" data-q="B3">
+    <div class="qh"><span class="qn">B3</span><span class="qt">Resolution per eye?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B3" value="1920×1080"> 1920×1080</label>
+      <label class="opt"><input type="radio" name="B3" value="1920×1200" data-rec="1"> 1920×1200 <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B3" value="2160×2160"> 2160×2160</label>
+      <label class="opt"><input type="radio" name="B3" value="3840×2160 (4K)"> 3840×2160 (4K)</label>
+    </div>
+  </div>
+  <div class="q" data-q="B4">
+    <div class="qh"><span class="qn">B4</span><span class="qt">Frame rate?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B4" value="30 fps"> 30 fps</label>
+      <label class="opt"><input type="radio" name="B4" value="60 fps" data-rec="1"> 60 fps <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B4" value="120 fps"> 120 fps</label>
+      <label class="opt"><input type="radio" name="B4" value="Task-dependent"> Task-dependent</label>
+    </div>
+  </div>
+  <div class="q" data-q="B5">
+    <div class="qh"><span class="qn">B5</span><span class="qt">Stereo baseline?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B5" value="63 mm (human interpupillary)" data-rec="1"> 63 mm (human interpupillary) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B5" value="80 mm"> 80 mm</label>
+      <label class="opt"><input type="radio" name="B5" value="120 mm or more"> 120 mm or more</label>
+      <label class="opt"><input type="radio" name="B5" value="Swappable / multi-baseline"> Swappable / multi-baseline</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Ego manipulation sits mostly at 0.3–0.8 m. A larger baseline raises the minimum measurable distance and shrinks the near-face overlap where hands and small objects live. Read together with <code>B6</code>.</div>
+  </div>
+  <div class="q" data-q="B6">
+    <div class="qh"><span class="qn">B6</span><span class="qt">Horizontal field of view?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B6" value="~90°" data-rec="1"> ~90° <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B6" value="~120°"> ~120°</label>
+      <label class="opt"><input type="radio" name="B6" value="&gt;150° / fisheye surround"> &gt;150° / fisheye surround</label>
+      <label class="opt"><input type="radio" name="B6" value="Provider decides"> Provider decides</label>
+    </div>
+  </div>
+  <div class="q" data-q="B7">
+    <div class="qh"><span class="qn">B7</span><span class="qt">Depth source?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="B7" value="Passive stereo disparity" data-rec="1"> Passive stereo disparity <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="B7" value="Additional ToF / depth sensor"> Additional ToF / depth sensor</label>
+      <label class="opt"><input type="checkbox" name="B7" value="Active structured light / IR projection"> Active structured light / IR projection <i class="alert">caveat</i></label>
+      <label class="opt"><input type="checkbox" name="B7" value="Learned monocular depth (not ground truth)"> Learned monocular depth (not ground truth)</label>
+      <label class="opt"><input type="checkbox" name="B7" value="No depth map, RGB only"> No depth map, RGB only</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>Active projection interferes across devices collecting in the same space and produces large volumes of unusable data. If selected, also answer <code>D3</code>.</div>
+  </div>
+  <div class="q" data-q="B8">
+    <div class="qh"><span class="qn">B8</span><span class="qt">Must depth carry a confidence / invalid-region mask?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="B8" value="Yes — mask required; invalid pixels left as holes, never interpolated" data-rec="1"> Yes — mask required; invalid pixels left as holes, never interpolated <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B8" value="Depth map only, confidence optional"> Depth map only, confidence optional</label>
+      <label class="opt"><input type="radio" name="B8" value="Not applicable (no depth)"> Not applicable (no depth)</label>
+      <label class="opt"><input type="radio" name="B8" value="Need a dedicated failure-region evaluation set for hard scenes"> Need a dedicated failure-region evaluation set for hard scenes</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Wet, reflective, transparent and low-texture surfaces break passive stereo matching at scale. An annotated failure map can itself be a valuable evaluation product.</div>
+  </div>
+  <div class="q" data-q="B9">
+    <div class="qh"><span class="qn">B9</span><span class="qt">Bitrate / compression per stream?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B9" value="8 Mbps (footage tier, heavy compression)"> 8 Mbps (footage tier, heavy compression)</label>
+      <label class="opt"><input type="radio" name="B9" value="20–30 Mbps (training tier)" data-rec="1"> 20–30 Mbps (training tier) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="B9" value="30–40 Mbps (high-fidelity training)"> 30–40 Mbps (high-fidelity training)</label>
+      <label class="opt"><input type="radio" name="B9" value="Near-lossless / RAW"> Near-lossless / RAW</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Stereo matching depends on fine texture; heavy compression erases skin and plain-surface detail. Bitrate drives SSD capacity, wireless concurrency and server storage — all three must be re-budgeted together.</div>
+  </div>
+</section>
+<section class="grp" data-g="C" data-title="Time synchronisation &amp; geometric ground truth">
+  <h2><span class="gn">C</span>Time synchronisation &amp; geometric ground truth<em>Determines whether the data can be used as metric 3D or action labels.</em></h2>
+  <div class="q" data-q="C1">
+    <div class="qh"><span class="qn">C1</span><span class="qt">Stereo exposure synchronisation target?</span><span class="tag">single</span><span class="tag hard">Hard gate</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C1" value="σ &lt; 10 µs (top tier)"> σ &lt; 10 µs (top tier)</label>
+      <label class="opt"><input type="radio" name="C1" value="σ &lt; 100 µs, with a measured histogram" data-rec="1"> σ &lt; 100 µs, with a measured histogram <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C1" value="&quot;Less than half a frame&quot; is enough (~8–16 ms)"> "Less than half a frame" is enough (~8–16 ms) <i class="alert">caveat</i></label>
+      <label class="opt"><input type="radio" name="C1" value="No measured number required"> No measured number required</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>The phrase "hardware sync" is not acceptable on its own — require the measured σ and the method: an LED / strobe event captured by both sensors simultaneously, N trials, report the standard deviation. A 1 ms offset produces roughly 12.5 mm of depth error at 1 m.</div>
+  </div>
+  <div class="q" data-q="C2">
+    <div class="qh"><span class="qn">C2</span><span class="qt">What instant does a frame timestamp refer to?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C2" value="Exposure midpoint, stamped in the driver / hardware" data-rec="1"> Exposure midpoint, stamped in the driver / hardware <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C2" value="VSYNC start"> VSYNC start</label>
+      <label class="opt"><input type="radio" name="C2" value="Host packet arrival time"> Host packet arrival time</label>
+      <label class="opt"><input type="radio" name="C2" value="Provider-defined, with a written definition"> Provider-defined, with a written definition</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Differences computed from in-packet timestamps are polluted by bus jitter; they are usable for a first screen only, not for acceptance.</div>
+  </div>
+  <div class="q" data-q="C3">
+    <div class="qh"><span class="qn">C3</span><span class="qt">Sensor clock domain?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C3" value="Both eyes + IMU share one oscillator / 64-bit ns counter" data-rec="1"> Both eyes + IMU share one oscillator / 64-bit ns counter <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C3" value="Both eyes share one clock; IMU has its own, stamped by an MCU"> Both eyes share one clock; IMU has its own, stamped by an MCU</label>
+      <label class="opt"><input type="radio" name="C3" value="Independent clocks, software alignment afterwards"> Independent clocks, software alignment afterwards</label>
+      <label class="opt"><input type="radio" name="C3" value="Not required"> Not required</label>
+    </div>
+  </div>
+  <div class="q" data-q="C4">
+    <div class="qh"><span class="qn">C4</span><span class="qt">IMU requirement?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C4" value="Required, ≥800 Hz, with a hardware FSYNC/DRDY pin" data-rec="1"> Required, ≥800 Hz, with a hardware FSYNC/DRDY pin <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C4" value="Required, 200–400 Hz is sufficient"> Required, 200–400 Hz is sufficient</label>
+      <label class="opt"><input type="radio" name="C4" value="Required, ≥1000 Hz (high-dynamics actions)"> Required, ≥1000 Hz (high-dynamics actions)</label>
+      <label class="opt"><input type="radio" name="C4" value="No IMU"> No IMU</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>The first selection criterion is the sync pin, not precision. The IMU must be rigidly mounted on the same board as the cameras and stay on the head — at the waist it measures the torso, not the head, and VIO breaks.</div>
+  </div>
+  <div class="q" data-q="C5">
+    <div class="qh"><span class="qn">C5</span><span class="qt">How is the fixed camera–IMU time offset `td` delivered?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C5" value="Factory-calibrated and written into the per-device calibration file" data-rec="1"> Factory-calibrated and written into the per-device calibration file <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C5" value="Written into a per-session sidecar"> Written into a per-session sidecar</label>
+      <label class="opt"><input type="radio" name="C5" value="Left to the consumer (Kalibr or equivalent)"> Left to the consumer (Kalibr or equivalent)</label>
+      <label class="opt"><input type="radio" name="C5" value="Not required"> Not required</label>
+    </div>
+  </div>
+  <div class="q" data-q="C6">
+    <div class="qh"><span class="qn">C6</span><span class="qt">Which per-device calibration files are required?</span><span class="tag">multi</span><span class="tag hard">Hard gate</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="C6" value="Individual intrinsics K and distortion" data-rec="1"> Individual intrinsics K and distortion <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="Stereo extrinsics R/t and baseline b" data-rec="1"> Stereo extrinsics R/t and baseline b <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="Reprojection RMS report" data-rec="1"> Reprojection RMS report <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="Rectification / Q matrices"> Rectification / Q matrices</label>
+      <label class="opt"><input type="checkbox" name="C6" value="Camera–IMU extrinsics and td" data-rec="1"> Camera–IMU extrinsics and <code>td</code> <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="Calibration file hash bound to device ID"> Calibration file hash bound to device ID</label>
+      <label class="opt"><input type="checkbox" name="C6" value="No per-device files (batch-level only)"> No per-device files (batch-level only)</label>
+    </div>
+  </div>
+  <div class="q" data-q="C7">
+    <div class="qh"><span class="qn">C7</span><span class="qt">Spatial accuracy gate?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C7" value="Reprojection RMS &lt; 0.5 px and epipolar offset &lt; 1 px" data-rec="1"> Reprojection RMS &lt; 0.5 px and epipolar offset &lt; 1 px <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C7" value="Relaxed to RMS &lt; 1 px / epipolar &lt; 2 px"> Relaxed to RMS &lt; 1 px / epipolar &lt; 2 px</label>
+      <label class="opt"><input type="radio" name="C7" value="A 3D trajectory accuracy figure (e.g. median error in mm) is required"> A 3D trajectory accuracy figure (e.g. median error in mm) is required</label>
+      <label class="opt"><input type="radio" name="C7" value="No quantitative gate"> No quantitative gate</label>
+    </div>
+    <div class="other">Specified 3D gate: <input class="q-other" data-q="C7" placeholder="write here"></div>
+  </div>
+  <div class="q" data-q="C8">
+    <div class="qh"><span class="qn">C8</span><span class="qt">Per-session calibration check?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C8" value="Calibration target / LED sync event at both start and end" data-rec="1"> Calibration target / LED sync event at both start and end <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C8" value="Start only"> Start only</label>
+      <label class="opt"><input type="radio" name="C8" value="Sampled by batch"> Sampled by batch</label>
+      <label class="opt"><input type="radio" name="C8" value="Not required"> Not required</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Sessions that drift beyond limits may still be kept as monocular footage, but must not be delivered as metric 3D data.</div>
+  </div>
+  <div class="q" data-q="C9">
+    <div class="qh"><span class="qn">C9</span><span class="qt">Stereo auto-exposure / gain / white balance?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C9" value="Master–slave locked, both eyes identical (left/right intensity difference &lt; 5%)" data-rec="1"> Master–slave locked, both eyes identical (left/right intensity difference &lt; 5%) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="C9" value="Independent AE, exposure start synchronised only"> Independent AE, exposure start synchronised only</label>
+      <label class="opt"><input type="radio" name="C9" value="Not required"> Not required</label>
+      <label class="opt"><input type="radio" name="C9" value="Provider-defined, with a written description"> Provider-defined, with a written description</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>Synchronising the trigger while letting each eye run its own AE means "same start, different duration". Stereo matching reads the brightness difference as texture and the hole rate climbs sharply.</div>
+  </div>
+</section>
+<section class="grp" data-g="D" data-title="Extra modalities &amp; multi-device">
+  <h2><span class="gn">D</span>Extra modalities &amp; multi-device<em>Determines whether hardware is added, and whether concurrent capture is allowed.</em></h2>
+  <div class="q" data-q="D1">
+    <div class="qh"><span class="qn">D1</span><span class="qt">Additional modalities?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="D1" value="Wrist camera (near-field / occlusion coverage)"> Wrist camera (near-field / occlusion coverage)</label>
+      <label class="opt"><input type="checkbox" name="D1" value="Force / tactile (UMI glove, gripper)"> Force / tactile (UMI glove, gripper)</label>
+      <label class="opt"><input type="checkbox" name="D1" value="Motion capture / proprioceptive joint state"> Motion capture / proprioceptive joint state</label>
+      <label class="opt"><input type="checkbox" name="D1" value="Audio"> Audio</label>
+      <label class="opt"><input type="checkbox" name="D1" value="Eye tracking / gaze"> Eye tracking / gaze</label>
+      <label class="opt"><input type="checkbox" name="D1" value="None — video + IMU only" data-rec="1"> None — video + IMU only <i class="rec">baseline</i></label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Grasping a strawberry and crushing it can look identical on camera; vision cannot see force. Force / tactile often raises data value more than another camera.</div>
+  </div>
+  <div class="q" data-q="D2">
+    <div class="qh"><span class="qn">D2</span><span class="qt">Time alignment of extra modalities with video?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="D2" value="Single clock domain, hardware sync (&lt; 100 µs)" data-rec="1"> Single clock domain, hardware sync (&lt; 100 µs) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="D2" value="Software alignment after the fact (ms)"> Software alignment after the fact (ms)</label>
+      <label class="opt"><input type="radio" name="D2" value="Independent clocks, convertible timestamps only"> Independent clocks, convertible timestamps only</label>
+      <label class="opt"><input type="radio" name="D2" value="Not applicable"> Not applicable</label>
+    </div>
+  </div>
+  <div class="q" data-q="D3">
+    <div class="qh"><span class="qn">D3</span><span class="qt">Will multiple devices collect in the same space?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="D3" value="Yes, typically 20–40 units" data-rec="1"> Yes, typically 20–40 units <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="D3" value="Yes, but fewer than 10"> Yes, but fewer than 10</label>
+      <label class="opt"><input type="radio" name="D3" value="No, one device at a time"> No, one device at a time</label>
+      <label class="opt"><input type="radio" name="D3" value="Undecided"> Undecided</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>With multiple units in one space, active IR / structured light must be disabled (mutual interference). Wireless backhaul needs AP and channel planning sized to the number of concurrent units.</div>
+  </div>
+  <div class="q" data-q="D4">
+    <div class="qh"><span class="qn">D4</span><span class="qt">Device form factor?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="D4" value="Split: lightweight head unit, compute / battery / cooling at the waist"> Split: lightweight head unit, compute / battery / cooling at the waist</label>
+      <label class="opt"><input type="radio" name="D4" value="All-in-one headset"> All-in-one headset</label>
+      <label class="opt"><input type="radio" name="D4" value="Form factor agnostic — accept on measurable indicators" data-rec="1"> Form factor agnostic — accept on measurable indicators <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="D4" value="Provider recommends"> Provider recommends</label>
+    </div>
+    <div class="other">Head-unit weight limit / continuous runtime: <input class="q-other" data-q="D4" placeholder="write here"></div>
+    <div class="hint"><span class="lb tip">Note</span>Specify head weight, shell temperature and runtime rather than the implementation. Both split designs (long-reach SerDes link) and all-in-one headsets are in mass production today.</div>
+  </div>
+</section>
+<section class="grp" data-g="E" data-title="Scenes &amp; content">
+  <h2><span class="gn">E</span>Scenes &amp; content<em>Determines capture difficulty, long-tail value and diversity evidence.</em></h2>
+  <div class="q" data-q="E1">
+    <div class="qh"><span class="qn">E1</span><span class="qt">Which standard scenes must be covered?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="E1" value="Home / daily living"> Home / daily living</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Hotel / housekeeping"> Hotel / housekeeping</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Factory line / assembly"> Factory line / assembly</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Retail / shelf stocking"> Retail / shelf stocking</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Commercial kitchen / food processing"> Commercial kitchen / food processing</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Warehouse / logistics / sorting"> Warehouse / logistics / sorting</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Agriculture / harvesting"> Agriculture / harvesting</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Healthcare / care work"> Healthcare / care work</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Outdoor / open road"> Outdoor / open road</label>
+      <label class="opt"><input type="checkbox" name="E1" value="Defined by our task book"> Defined by our task book</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Folding laundry, cleaning, home and hotel scenes are already heavily collected. Novelty is not value — prioritise real work that is hard to stage.</div>
+  </div>
+  <div class="q" data-q="E2">
+    <div class="qh"><span class="qn">E2</span><span class="qt">Are special / physically long-tail scenes required?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="E2" value="Wet / reflective / water-present (seafood or fish processing)"> Wet / reflective / water-present (seafood or fish processing)</label>
+      <label class="opt"><input type="checkbox" name="E2" value="Deformable objects (dough, fabric, thread, clay)"> Deformable objects (dough, fabric, thread, clay)</label>
+      <label class="opt"><input type="checkbox" name="E2" value="Long-horizon procedures (traditional crafts / intangible heritage)"> Long-horizon procedures (traditional crafts / intangible heritage)</label>
+      <label class="opt"><input type="checkbox" name="E2" value="Fine asymmetric bimanual coordination"> Fine asymmetric bimanual coordination</label>
+      <label class="opt"><input type="checkbox" name="E2" value="Professional tool use / assembly and repair"> Professional tool use / assembly and repair</label>
+      <label class="opt"><input type="checkbox" name="E2" value="Transparent / low-texture / mirror surfaces"> Transparent / low-texture / mirror surfaces</label>
+      <label class="opt"><input type="checkbox" name="E2" value="Low temperature / high humidity / dust"> Low temperature / high humidity / dust</label>
+      <label class="opt"><input type="checkbox" name="E2" value="No special scenes for now"> No special scenes for now</label>
+    </div>
+    <div class="other">Named scenes / procedures: <input class="q-other" data-q="E2" placeholder="write here"></div>
+    <div class="hint"><span class="lb tip">Note</span>These often need IP-rated, anti-fog, low-temperature hardware, and passive stereo fails on wet reflective surfaces. Pilot at small scale before scaling capacity. Check for existing public datasets before commissioning a batch.</div>
+  </div>
+  <div class="q" data-q="E3">
+    <div class="qh"><span class="qn">E3</span><span class="qt">Are failure / recovery / negative examples required?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="E3" value="Required, separately annotated" data-rec="1"> Required, separately annotated <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="E3" value="Optional"> Optional</label>
+      <label class="opt"><input type="radio" name="E3" value="Not required — successful trajectories only"> Not required — successful trajectories only</label>
+      <label class="opt"><input type="radio" name="E3" value="Depends on scenario"> Depends on scenario</label>
+    </div>
+  </div>
+  <div class="q" data-q="E4">
+    <div class="qh"><span class="qn">E4</span><span class="qt">Diversity evidence?</span><span class="tag">multi</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="checkbox" name="E4" value="Counts of tasks / objects / environments / operators" data-rec="1"> Counts of tasks / objects / environments / operators <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="E4" value="Scene and long-tail distribution table"> Scene and long-tail distribution table</label>
+      <label class="opt"><input type="checkbox" name="E4" value="Cap on any single operator / device share"> Cap on any single operator / device share</label>
+      <label class="opt"><input type="checkbox" name="E4" value="No statistics required"> No statistics required</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>Current dataset quality standards include a diversity dimension that must be evidenced. A highlight reel is not a substitute for full-distribution statistics.</div>
+  </div>
+  <div class="q" data-q="E5">
+    <div class="qh"><span class="qn">E5</span><span class="qt">Cap on hours per single scene?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="E5" value="≤ 150 h per scene" data-rec="1"> ≤ 150 h per scene <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="E5" value="Fixed by us"> Fixed by us</label>
+      <label class="opt"><input type="radio" name="E5" value="No cap"> No cap</label>
+      <label class="opt"><input type="radio" name="E5" value="Provider advises"> Provider advises</label>
+    </div>
+    <div class="other">Specified cap: <input class="q-other" data-q="E5" placeholder="write here"></div>
+  </div>
+</section>
+<section class="grp" data-g="F" data-title="Delivery format &amp; labels">
+  <h2><span class="gn">F</span>Delivery format &amp; labels<em>Determines whether the data can enter a training pipeline directly.</em></h2>
+  <div class="q" data-q="F1">
+    <div class="qh"><span class="qn">F1</span><span class="qt">Archive container / dataset format?</span><span class="tag">multi</span><span class="tag hard">Hard gate</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F1" value="MCAP as the archival source of truth" data-rec="1"> MCAP as the archival source of truth <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F1" value="LeRobot v3"> LeRobot v3</label>
+      <label class="opt"><input type="checkbox" name="F1" value="RLDS / Open X-Embodiment"> RLDS / Open X-Embodiment</label>
+      <label class="opt"><input type="checkbox" name="F1" value="ROS 2 bag"> ROS 2 bag</label>
+      <label class="opt"><input type="checkbox" name="F1" value="Provider-specific format (parser library required)"> Provider-specific format (parser library required)</label>
+    </div>
+    <div class="other">Named internal format / version: <input class="q-other" data-q="F1" placeholder="write here"></div>
+    <div class="hint"><span class="lb hard">Hard gate</span>Never give up the archival copy — format upgrades must not destroy original timestamps. If the downstream format is undecided, lock MCAP first. Common pitfalls: float32 metres vs uint16 millimetres (1000× error), invalid-depth sentinels that collide with real values, and depth aligned to the wrong reference frame.</div>
+  </div>
+  <div class="q" data-q="F2">
+    <div class="qh"><span class="qn">F2</span><span class="qt">Video codec?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="F2" value="H.265 / HEVC" data-rec="1"> H.265 / HEVC <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="F2" value="H.264 / AVC"> H.264 / AVC</label>
+      <label class="opt"><input type="radio" name="F2" value="Near-lossless intra-frame"> Near-lossless intra-frame</label>
+      <label class="opt"><input type="radio" name="F2" value="RAW / uncompressed"> RAW / uncompressed</label>
+    </div>
+  </div>
+  <div class="q" data-q="F3">
+    <div class="qh"><span class="qn">F3</span><span class="qt">Which labels / ground truth are required?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F3" value="2D hand keypoints"> 2D hand keypoints</label>
+      <label class="opt"><input type="checkbox" name="F3" value="3D hand / wrist trajectories" data-rec="1"> 3D hand / wrist trajectories <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F3" value="6DoF head pose / SLAM trajectory" data-rec="1"> 6DoF head pose / SLAM trajectory <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F3" value="Depth map / point cloud + confidence"> Depth map / point cloud + confidence</label>
+      <label class="opt"><input type="checkbox" name="F3" value="Action / skill semantic labels"> Action / skill semantic labels</label>
+      <label class="opt"><input type="checkbox" name="F3" value="Success / failure / quality annotation"> Success / failure / quality annotation</label>
+      <label class="opt"><input type="checkbox" name="F3" value="Temporal step decomposition / segment boundaries"> Temporal step decomposition / segment boundaries</label>
+      <label class="opt"><input type="checkbox" name="F3" value="Object boxes / classes / attributes"> Object boxes / classes / attributes</label>
+      <label class="opt"><input type="checkbox" name="F3" value="Force / tactile channels (if D1 selected)"> Force / tactile channels (if <code>D1</code> selected)</label>
+      <label class="opt"><input type="checkbox" name="F3" value="Raw video only, no annotation"> Raw video only, no annotation</label>
+    </div>
+  </div>
+  <div class="q" data-q="F4">
+    <div class="qh"><span class="qn">F4</span><span class="qt">Mandatory per-frame metadata?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F4" value="frame_id / sequence number / trigger counter" data-rec="1"> <code>frame_id</code> / sequence number / trigger counter <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="Monotonic exposure-midpoint timestamp in ns" data-rec="1"> Monotonic exposure-midpoint timestamp in ns <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="exposure_us / gain / white balance" data-rec="1"> <code>exposure_us</code> / gain / white balance <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="Device ID / session ID" data-rec="1"> Device ID / session ID <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="Calibration file hash"> Calibration file hash</label>
+      <label class="opt"><input type="checkbox" name="F4" value="Operator / scene / task codes"> Operator / scene / task codes</label>
+    </div>
+  </div>
+  <div class="q" data-q="F5">
+    <div class="qh"><span class="qn">F5</span><span class="qt">Coordinate frame and units?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="F5" value="Written convention plus transforms to the robot frame" data-rec="1"> Written convention plus transforms to the robot frame <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="F5" value="Provider default, documented"> Provider default, documented</label>
+      <label class="opt"><input type="radio" name="F5" value="Not required"> Not required</label>
+      <label class="opt"><input type="radio" name="F5" value="Our coordinate definition (attached separately)"> Our coordinate definition (attached separately)</label>
+    </div>
+  </div>
+  <div class="q" data-q="F6">
+    <div class="qh"><span class="qn">F6</span><span class="qt">Delivered alongside the data?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F6" value="Per-session manifest (inventory + checksums)" data-rec="1"> Per-session manifest (inventory + checksums) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="QA daily / batch report" data-rec="1"> QA daily / batch report <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="Rerunnable QA scripts" data-rec="1"> Rerunnable QA scripts <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="Denominators recomputable under the consumer&#x27;s definition" data-rec="1"> Denominators recomputable under the consumer's definition <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="Data dictionary / schema"> Data dictionary / schema</label>
+      <label class="opt"><input type="checkbox" name="F6" value="SDK / reader sample code"> SDK / reader sample code</label>
+    </div>
+  </div>
+</section>
+<section class="grp" data-g="G" data-title="QA &amp; acceptance">
+  <h2><span class="gn">G</span>QA &amp; acceptance<em>Determines what counts as conforming, and what happens when it does not.</em></h2>
+  <div class="q" data-q="G1">
+    <div class="qh"><span class="qn">G1</span><span class="qt">Acceptance basis?</span><span class="tag">multi</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="checkbox" name="G1" value="Current industry dataset quality standard (eight dimensions)" data-rec="1"> Current industry dataset quality standard (eight dimensions) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="G1" value="Mutually agreed quality SLA / thresholds from Section C" data-rec="1"> Mutually agreed quality SLA / thresholds from Section C <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="G1" value="Downstream model team&#x27;s measured pass rate"> Downstream model team's measured pass rate</label>
+      <label class="opt"><input type="checkbox" name="G1" value="Provider&#x27;s factory inspection only"> Provider's factory inspection only</label>
+    </div>
+    <div class="other">Named standard / version: <input class="q-other" data-q="G1" placeholder="write here"></div>
+  </div>
+  <div class="q" data-q="G2">
+    <div class="qh"><span class="qn">G2</span><span class="qt">Sampling method?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="G2" value="Random ≥ 5%, batch chosen by the consumer" data-rec="1"> Random ≥ 5%, batch chosen by the consumer <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="G2" value="Full automated scan + manual sample review"> Full automated scan + manual sample review</label>
+      <label class="opt"><input type="radio" name="G2" value="Provider&#x27;s cherry-picked highlight samples only"> Provider's cherry-picked highlight samples only <i class="alert">caveat</i></label>
+      <label class="opt"><input type="radio" name="G2" value="Full item-by-item inspection"> Full item-by-item inspection</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>State explicitly that highlight samples are not an acceptance basis, otherwise the quality distribution cannot be evidenced.</div>
+  </div>
+  <div class="q" data-q="G3">
+    <div class="qh"><span class="qn">G3</span><span class="qt">Rejection / usable-rate threshold?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="G3" value="Written ceiling, with denominators recomputable by the consumer" data-rec="1"> Written ceiling, with denominators recomputable by the consumer <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="G3" value="Declared by the provider, spot-checked by the consumer"> Declared by the provider, spot-checked by the consumer</label>
+      <label class="opt"><input type="radio" name="G3" value="No threshold"> No threshold</label>
+      <label class="opt"><input type="radio" name="G3" value="Bill by usable volume, no rejection-rate gate"> Bill by usable volume, no rejection-rate gate</label>
+    </div>
+    <div class="other">Agreed minimum usable rate: <input class="q-other" data-q="G3" placeholder="write here"></div>
+  </div>
+  <div class="q" data-q="G4">
+    <div class="qh"><span class="qn">G4</span><span class="qt">Remedies for non-conformance?</span><span class="tag">multi</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="checkbox" name="G4" value="Remove and redeliver" data-rec="1"> Remove and redeliver <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="G4" value="Discount by usable volume"> Discount by usable volume</label>
+      <label class="opt"><input type="checkbox" name="G4" value="Full batch recapture"> Full batch recapture</label>
+      <label class="opt"><input type="checkbox" name="G4" value="Written dispute window + re-inspection" data-rec="1"> Written dispute window + re-inspection <i class="rec">baseline</i></label>
+    </div>
+  </div>
+  <div class="q" data-q="G5">
+    <div class="qh"><span class="qn">G5</span><span class="qt">Is a pilot batch required before scaling?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="G5" value="Yes — small pilot batch accepted first" data-rec="1"> Yes — small pilot batch accepted first <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="G5" value="Yes, with downstream model-team feedback"> Yes, with downstream model-team feedback</label>
+      <label class="opt"><input type="radio" name="G5" value="No, direct volume delivery"> No, direct volume delivery</label>
+      <label class="opt"><input type="radio" name="G5" value="Undecided"> Undecided</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>A small pilot measuring rejection rate, sync σ and downstream usability is the most effective gate against rework.</div>
+  </div>
+</section>
+<section class="grp" data-g="H" data-title="Governance, privacy &amp; commercial boundaries">
+  <h2><span class="gn">H</span>Governance, privacy &amp; commercial boundaries<em>No prices appear in this section — only responsibilities and units of measurement.</em></h2>
+  <div class="q" data-q="H1">
+    <div class="qh"><span class="qn">H1</span><span class="qt">Privacy and consent?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="H1" value="Written operator consent" data-rec="1"> Written operator consent <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="H1" value="Written venue / site consent" data-rec="1"> Written venue / site consent <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="H1" value="Face / licence plate / on-screen text redaction"> Face / licence plate / on-screen text redaction</label>
+      <label class="opt"><input type="checkbox" name="H1" value="Third-party likeness and trade-secret screening"> Third-party likeness and trade-secret screening</label>
+      <label class="opt"><input type="checkbox" name="H1" value="Notice text provided by the consumer"> Notice text provided by the consumer</label>
+      <label class="opt"><input type="checkbox" name="H1" value="Notice text provided by the provider"> Notice text provided by the provider</label>
+    </div>
+  </div>
+  <div class="q" data-q="H2">
+    <div class="qh"><span class="qn">H2</span><span class="qt">Data ownership and licensing?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H2" value="Exclusive to the data consumer"> Exclusive to the data consumer</label>
+      <label class="opt"><input type="radio" name="H2" value="Usable and sublicensable by the consumer"> Usable and sublicensable by the consumer</label>
+      <label class="opt"><input type="radio" name="H2" value="Provider retains some rights"> Provider retains some rights</label>
+      <label class="opt"><input type="radio" name="H2" value="To be decided"> To be decided</label>
+    </div>
+  </div>
+  <div class="q" data-q="H3">
+    <div class="qh"><span class="qn">H3</span><span class="qt">Cross-border data transfer?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H3" value="Domestic storage and use only" data-rec="1"> Domestic storage and use only <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="H3" value="May be transferred across borders"> May be transferred across borders</label>
+      <label class="opt"><input type="radio" name="H3" value="Undecided"> Undecided</label>
+      <label class="opt"><input type="radio" name="H3" value="Not applicable"> Not applicable</label>
+    </div>
+  </div>
+  <div class="q" data-q="H4">
+    <div class="qh"><span class="qn">H4</span><span class="qt">Should this spec cover collector compensation?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="H4" value="No — data procurement only; compensation handled separately" data-rec="1"> No — data procurement only; compensation handled separately <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="H4" value="Yes, payment by valid duration"> Yes, payment by valid duration</label>
+      <label class="opt"><input type="radio" name="H4" value="Yes, but only per-device duration / timing statistics"> Yes, but only per-device duration / timing statistics</label>
+      <label class="opt"><input type="radio" name="H4" value="Undecided"> Undecided</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>The price paid for data and the wages paid to collectors are two different sums with two different counterparties. If "valid duration" is used, quality judgement and dispute rules must also be defined.</div>
+  </div>
+  <div class="q" data-q="H5">
+    <div class="qh"><span class="qn">H5</span><span class="qt">Unit of measurement for pricing?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H5" value="Valid duration (hours)"> Valid duration (hours)</label>
+      <label class="opt"><input type="radio" name="H5" value="Raw capture duration (hours)"> Raw capture duration (hours)</label>
+      <label class="opt"><input type="radio" name="H5" value="Per frame / episode"> Per frame / episode</label>
+      <label class="opt"><input type="radio" name="H5" value="Per session / project package"> Per session / project package</label>
+      <label class="opt"><input type="radio" name="H5" value="To be decided" data-rec="1"> To be decided <i class="rec">baseline</i></label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>This document contains no prices. The unit is agreed first; the price list is a separate annex.</div>
+  </div>
+  <div class="q" data-q="H6">
+    <div class="qh"><span class="qn">H6</span><span class="qt">Delivery and deployment?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H6" value="On-premise / local edge server" data-rec="1"> On-premise / local edge server <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="H6" value="Provider cloud"> Provider cloud</label>
+      <label class="opt"><input type="radio" name="H6" value="Hybrid (local capture + cloud management)"> Hybrid (local capture + cloud management)</label>
+      <label class="opt"><input type="radio" name="H6" value="Physical media / disk handover"> Physical media / disk handover</label>
+    </div>
+    <div class="hint"><span class="lb hard">Hard gate</span>If on-premise, confirm the device vendor's management / upload pipeline can be fully self-hosted. This single item decides whether a local edge-server architecture is viable at all.</div>
+  </div>
+</section>
+<section class="grp" data-g="I" data-title="Scale, cadence &amp; supporting material">
+  <h2><span class="gn">I</span>Scale, cadence &amp; supporting material<em>Determines production planning, server count and delivery milestones.</em></h2>
+  <div class="q" data-q="I1">
+    <div class="qh"><span class="qn">I1</span><span class="qt">First batch size?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="I1" value="20–40 units (validation batch)" data-rec="1"> 20–40 units (validation batch) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="I1" value="200 units"> 200 units</label>
+      <label class="opt"><input type="radio" name="I1" value="More than 200"> More than 200</label>
+      <label class="opt"><input type="radio" name="I1" value="Validation batch first, decide later"> Validation batch first, decide later</label>
+    </div>
+    <div class="other">Exact count: <input class="q-other" data-q="I1" placeholder="write here"></div>
+  </div>
+  <div class="q" data-q="I2">
+    <div class="qh"><span class="qn">I2</span><span class="qt">Number of edge servers / sites?</span><span class="tag">single</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="I2" value="1 (pilot)" data-rec="1"> 1 (pilot) <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="I2" value="5 (40 units per server)"> 5 (40 units per server)</label>
+      <label class="opt"><input type="radio" name="I2" value="Determined by actual site count"> Determined by actual site count</label>
+      <label class="opt"><input type="radio" name="I2" value="Provider bundles it; we verify function only"> Provider bundles it; we verify function only</label>
+    </div>
+    <div class="other">Sites / units per site: <input class="q-other" data-q="I2" placeholder="write here"></div>
+  </div>
+  <div class="q" data-q="I3">
+    <div class="qh"><span class="qn">I3</span><span class="qt">Required server-side functions?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="I3" value="Receive terminal data uploads" data-rec="1"> Receive terminal data uploads <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="I3" value="Per-device capture duration / timing statistics" data-rec="1"> Per-device capture duration / timing statistics <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="I3" value="Video cleaning and inspection"> Video cleaning and inspection</label>
+      <label class="opt"><input type="checkbox" name="I3" value="Quality coefficient / valid-duration judgement"> Quality coefficient / valid-duration judgement</label>
+      <label class="opt"><input type="checkbox" name="I3" value="Compensation ledger / dispute arbitration"> Compensation ledger / dispute arbitration</label>
+      <label class="opt"><input type="checkbox" name="I3" value="Dashboard / export / fleet management"> Dashboard / export / fleet management</label>
+      <label class="opt"><input type="checkbox" name="I3" value="Multi-view to 3D label conversion"> Multi-view to 3D label conversion</label>
+    </div>
+    <div class="hint"><span class="lb tip">Note</span>"Upload + timing" and "+ cleaning &amp; inspection" are two different software and hardware configurations. Tick by phase and price by phase.</div>
+  </div>
+  <div class="q" data-q="I4">
+    <div class="qh"><span class="qn">I4</span><span class="qt">Delivery cadence?</span><span class="tag">single</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="I4" value="Phased: validation batch, then volume batch" data-rec="1"> Phased: validation batch, then volume batch <i class="rec">baseline</i></label>
+      <label class="opt"><input type="radio" name="I4" value="Single delivery"> Single delivery</label>
+      <label class="opt"><input type="radio" name="I4" value="Milestone / rolling per site"> Milestone / rolling per site</label>
+      <label class="opt"><input type="radio" name="I4" value="Undecided"> Undecided</label>
+    </div>
+  </div>
+  <div class="q" data-q="I5">
+    <div class="qh"><span class="qn">I5</span><span class="qt">Supporting documents / services?</span><span class="tag">multi</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="I5" value="Device datasheet / measured parameter report" data-rec="1"> Device datasheet / measured parameter report <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="I5" value="SDK / API documentation"> SDK / API documentation</label>
+      <label class="opt"><input type="checkbox" name="I5" value="Sample calibration report / sample data" data-rec="1"> Sample calibration report / sample data <i class="rec">baseline</i></label>
+      <label class="opt"><input type="checkbox" name="I5" value="Deployment and operations manual"> Deployment and operations manual</label>
+      <label class="opt"><input type="checkbox" name="I5" value="On-site training / integration support"> On-site training / integration support</label>
+      <label class="opt"><input type="checkbox" name="I5" value="Warranty and spare-parts terms"> Warranty and spare-parts terms</label>
+    </div>
+  </div>
+  <div class="q" data-q="I6">
+    <div class="qh"><span class="qn">I6</span><span class="qt">Anything else / open comments</span><span class="tag">single</span></div>
+    <div class="other">Free text: <input class="q-other" data-q="I6" placeholder="write here"></div>
+  </div>
+</section>
+
+<div id="summary">
+  <h2>Configuration summary — paste into a GitHub Issue</h2>
+  <p class="sd">Unticked items are marked <b>[not ticked]</b>. One item per Issue is easiest to discuss; keep the item ID in the title.</p>
+  <div id="out"></div>
+  <div class="missing" id="missing"></div>
+  <div class="srow">
+    <button class="primary" onclick="copySummary(this)">Copy to clipboard</button>
+    <button onclick="window.print()">Print this checklist</button>
+    <button onclick="document.getElementById('summary').style.display='none'">Hide summary</button>
+  </div>
+</div>
+
+<div class="end">
+  <h2>How to read the result</h2>
+  <p>Nothing here is a requirement yet. The purpose of this RFC is to find out which of these 54 questions the community thinks belong in a real data contract, and which are over-engineering. The most useful outcome would be a shorter list with better justified thresholds.</p>
+  <h2 style="margin-top:18px">Changelog</h2>
+  <p style="margin:0"><code>0.1</code> — 2026-11-10 — initial draft for public comment.</p>
+  <h2 style="margin-top:18px">Attribution &amp; license</h2>
+  <p style="margin:0">To be set by the repository owner before publishing. If you reuse this checklist, please keep a link back to the source repository.</p>
+</div>
+
+<p class="foot">EGO-S2 · RFC 0.1 · Draft for public comment · This document contains no prices and is not a contract</p>
+
+</div>
+
+<script>
+const KEY = 'ego_s2_rfc_en_v1';
+const $  = s => document.querySelectorAll(s);
+
+function state(){
+  const d = {sel:{}, txt:{}};
+  $('input[type=radio],input[type=checkbox]').forEach(i=>{
+    if(i.checked) (d.sel[i.name] = d.sel[i.name] || []).push(i.value);
+  });
+  $('input.q-other').forEach(i=>{ d.txt['q:'+i.dataset.q] = i.value; });
+  return d;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state())); }catch(e){} update(); }
+function restore(){
+  let d; try{ d = JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ d=null; }
+  if(!d){ update(); return; }
+  const sel=d.sel||{}, txt=d.txt||{};
+  $('input[type=radio],input[type=checkbox]').forEach(i=>{
+    i.checked = (sel[i.name]||[]).includes(i.value);
+  });
+  Object.entries(txt).forEach(([k,v])=>{
+    const el = document.querySelector('input.q-other[data-q="'+k.slice(2)+'"]');
+    if(el) el.value = v;
+  });
+  update();
+}
+function update(){
+  const qs = $('.q'); let done = 0;
+  qs.forEach(q=>{
+    const c = q.querySelectorAll('input:checked').length;
+    const o = q.querySelector('input.q-other');
+    if(c > 0 || (o && o.value.trim())) done++;
+  });
+  document.getElementById('prog').textContent = done + ' / ' + qs.length + ' ticked';
+  document.getElementById('barfill').style.width = (done/qs.length*100).toFixed(1)+'%';
+}
+function fillRec(){
+  $('.q').forEach(q=>{
+    const rec = [...q.querySelectorAll('input[data-rec="1"]')];
+    if(!rec.length) return;
+    if(rec[0].type === 'radio'){
+      if(!q.querySelector('input:checked')) rec[0].checked = true;
+    }else{
+      if(!q.querySelector('input:checked')) rec.forEach(i=>i.checked = true);
+    }
+  });
+  save();
+}
+function clearAll(){
+  if(!confirm('Clear all ticks and notes on this page?')) return;
+  $('input[type=radio],input[type=checkbox]').forEach(i=>i.checked=false);
+  $('input.q-other').forEach(i=>i.value='');
+  save();
+}
+function buildSummary(){
+  const L=[];
+  L.push('## Configuration / comments on RFC 0.1 (EGO-S2)');
+  L.push('<!-- Paste into a new GitHub Issue. One item per Issue is easiest to discuss. -->');
+  L.push('');
+  let missing = 0;
+  $('.grp').forEach(g=>{
+    L.push('### '+g.dataset.g+'. '+g.dataset.title);
+    g.querySelectorAll('.q').forEach(q=>{
+      const qt = q.querySelector('.qt').textContent.trim();
+      const picked = [...q.querySelectorAll('input:checked')].map(i=>i.value);
+      const o = q.querySelector('input.q-other');
+      const extra = o && o.value.trim() ? 'Note: '+o.value.trim() : '';
+      const parts = picked.concat(extra?[extra]:[]);
+      if(!parts.length){ missing++; L.push('- [ ] '+q.dataset.q+' '+qt+' -> [not ticked]'); }
+      else L.push('- [x] '+q.dataset.q+' '+qt+' -> '+parts.join('; '));
+    });
+    L.push('');
+  });
+  L.push('---');
+  L.push('Item: (which item you want to discuss)');
+  L.push('Position: Agree / Disagree / Needs a different threshold');
+  L.push('Evidence: (paper, datasheet, measurement, deployment experience)');
+  L.push('Use case: (what you are training, on which embodiment)');
+  L.push('Proposal: (the exact wording you would change it to)');
+  L.push('');
+  L.push('This document contains no prices and is not a contract.');
+  document.getElementById('out').textContent = L.join('\n');
+  const m = document.getElementById('missing');
+  m.textContent = missing ? ('Note: '+missing+' items are not ticked — leave them as [not ticked] or state "not required".') : 'All 54 items have an answer.';
+  document.getElementById('summary').style.display='block';
+  document.getElementById('summary').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function copySummary(btn){
+  const t = document.getElementById('out').textContent;
+  const done = ()=>{ const o=btn.textContent; btn.textContent='Copied'; setTimeout(()=>btn.textContent=o,1500); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallback(t,done));
+  }else fallback(t,done);
+}
+function fallback(t,cb){
+  const a=document.createElement('textarea'); a.value=t; document.body.appendChild(a);
+  a.select(); try{document.execCommand('copy'); cb();}catch(e){alert('Copy failed — please select the summary text manually.');}
+  a.remove();
+}
+document.addEventListener('change', e=>{ if(e.target.matches('input')) save(); });
+document.addEventListener('input',  e=>{ if(e.target.matches('input.q-other')) save(); });
+restore();
+</script>
+</body>
+</html>
