@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EGO-S2 具身训练数据 · 客户需求勾选单</title>
+<style>
+:root{
+  --ink:#1b2430; --muted:#6b7684; --line:#dde4ec; --bg:#f4f7fa; --card:#fff;
+  --brand:#1d4e79; --brand-soft:#eaf1f8; --ok:#2c7a58; --ok-soft:#e8f4ed;
+  --warn:#b3532c; --warn-soft:#fdf0e9; --hard:#a6302c; --hard-soft:#fbecec;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px 60px}
+
+/* toolbar */
+.toolbar{position:sticky;top:0;z-index:20;background:rgba(244,247,250,.96);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:22px}
+.toolbar .inner{max-width:1000px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.toolbar .tt{font-weight:700;color:var(--brand);margin-right:auto;font-size:14px}
+.prog{font-size:12px;color:var(--muted);margin-right:6px;white-space:nowrap}
+.bar{width:110px;height:6px;border-radius:4px;background:#dfe6ee;overflow:hidden;margin-right:10px}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+button{font:inherit;font-size:12.5px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;
+  background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--brand);color:var(--brand)}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+button.primary:hover{background:#163d5e;color:#fff}
+button.ghost{background:transparent}
+
+/* header */
+.hd{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px 26px;margin-bottom:16px}
+.eyebrow{font-size:11.5px;letter-spacing:.18em;color:var(--brand);font-weight:700;margin:0 0 6px}
+h1{font-size:25px;line-height:1.35;margin:0 0 8px;letter-spacing:-.02em}
+.hd .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 18px;border-top:1px solid var(--line);padding-top:16px}
+.meta label{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
+.meta input{width:100%;border:0;border-bottom:1px solid #c9d4e0;background:transparent;padding:3px 1px;font:inherit;font-size:13px;color:var(--ink);outline:none}
+.meta input:focus{border-bottom-color:var(--brand)}
+.note{background:var(--brand-soft);border-left:3px solid var(--brand);border-radius:0 6px 6px 0;
+  padding:12px 16px;margin-bottom:20px;font-size:12.8px;color:#33465b}
+.note b{color:var(--brand)}
+.note ol{margin:6px 0 0;padding-left:20px}
+.note li{margin:2px 0}
+
+/* group */
+.grp{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.grp>h2{display:flex;align-items:center;gap:10px;margin:0;padding:14px 20px;background:#f8fafc;
+  border-bottom:1px solid var(--line);font-size:15.5px;font-weight:700}
+.gn{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:6px;
+  background:var(--brand);color:#fff;font-size:13px;flex:0 0 auto}
+.grp>h2 em{font-style:normal;font-weight:400;font-size:12px;color:var(--muted);margin-left:auto;text-align:right}
+
+/* question */
+.q{padding:14px 20px 13px;border-bottom:1px dashed #e8edf3}
+.q:last-child{border-bottom:0}
+.qh{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+.qn{font-size:11.5px;font-weight:700;color:var(--brand);background:var(--brand-soft);
+  padding:1px 6px;border-radius:4px;flex:0 0 auto}
+.qt{font-weight:600;font-size:13.6px}
+.tag{font-size:10.5px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-left:2px}
+.tag.hard{color:var(--hard);border-color:#eccdcd;background:var(--hard-soft)}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:5px 12px}
+.opts.two{grid-template-columns:repeat(2,1fr)}
+.opts.one{grid-template-columns:1fr}
+.opt{display:flex;align-items:flex-start;gap:7px;font-size:12.8px;line-height:1.5;padding:3px 5px;
+  border-radius:5px;cursor:pointer;color:#33404f}
+.opt:hover{background:#f5f8fb}
+.opt input{margin:3px 0 0;flex:0 0 auto;width:14px;height:14px;accent-color:var(--brand);cursor:pointer}
+.rec{font-style:normal;font-size:10px;color:var(--ok);background:var(--ok-soft);border:1px solid #cfe7d9;
+  border-radius:3px;padding:0 4px;margin-left:4px;white-space:nowrap}
+.alert{font-style:normal;font-size:10px;color:var(--warn);background:var(--warn-soft);border:1px solid #f0d6c6;
+  border-radius:3px;padding:0 4px;margin-left:4px;white-space:nowrap}
+.other{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.other input{flex:1;max-width:420px;border:0;border-bottom:1px dashed #c9d4e0;padding:3px 2px;font:inherit;font-size:12.5px;outline:none;background:transparent}
+.hint{font-size:11.6px;color:var(--muted);margin-top:8px;padding-left:2px}
+.hint b{color:#46586c;font-weight:600}
+.hint .lb{display:inline-block;font-size:10.5px;border-radius:3px;padding:0 5px;margin-right:5px}
+.lb.cost{background:#fdf3e6;color:#96631c;border:1px solid #f0dcbc}
+.lb.hard{background:var(--hard-soft);color:var(--hard);border:1px solid #eccdcd}
+.lb.tip{background:#eef2f7;color:#52657a;border:1px solid #dde5ee}
+
+/* summary */
+#summary{display:none;background:var(--card);border:2px solid var(--brand);border-radius:10px;padding:22px 24px;margin-bottom:16px}
+#summary h2{margin:0 0 6px;font-size:17px;color:var(--brand)}
+#summary .sd{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+#out{white-space:pre-wrap;font:12.4px/1.75 ui-monospace,SFMono-Regular,Menlo,Consolas,"PingFang SC",monospace;
+  background:#f7fafc;border:1px solid var(--line);border-radius:6px;padding:16px;max-height:460px;overflow:auto}
+.srow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.missing{color:var(--warn);font-size:12.5px;margin:10px 0 0}
+
+/* sign */
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:20px;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;padding:20px 24px;margin-bottom:8px}
+.sign .box{border-bottom:1px solid #b9c6d5;height:42px}
+.sign .lb{font-size:12px;color:var(--muted);margin-bottom:2px}
+.sign .cap{font-size:12.5px;color:var(--muted);margin-top:8px}
+.foot{text-align:center;font-size:11.5px;color:#93a0ae;padding:10px 0}
+
+@media (max-width:760px){
+  .opts{grid-template-columns:repeat(2,1fr)}
+  .meta{grid-template-columns:repeat(2,1fr)}
+  .grp>h2 em{display:none}
+}
+@media print{
+  body{background:#fff;font-size:11.5px}
+  .wrap{max-width:none;padding:0}
+  .toolbar,#summary,.srow,.missing{display:none !important}
+  .hd,.grp,.sign{border:1px solid #cfd8e2;border-radius:0;box-shadow:none;break-inside:avoid}
+  .hd{padding:16px 18px;margin-bottom:10px}
+  h1{font-size:20px}
+  .note{padding:9px 12px;margin-bottom:12px}
+  .grp{margin-bottom:10px}
+  .grp>h2{padding:9px 14px;background:#f2f6fa !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gn{background:#1d4e79 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .q{padding:9px 14px;break-inside:avoid}
+  .opts{gap:3px 10px}
+  .opt{font-size:11px;padding:1px 3px}
+  .opt input{width:11px;height:11px}
+  .hint{font-size:10px;margin-top:4px}
+  .other{margin-top:4px}
+  .sign{padding:14px 18px}
+  .rec,.alert,.tag,.lb{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar"><div class="inner">
+  <span class="tt">EGO-S2 · 客户需求勾选单</span>
+  <span class="prog" id="prog">已勾 0 / 0 题</span>
+  <span class="bar"><i id="barfill"></i></span>
+  <button onclick="fillRec()">填入建议值</button>
+  <button onclick="clearAll()" class="ghost">清空</button>
+  <button onclick="buildSummary()" class="primary">生成配置摘要</button>
+  <button onclick="window.print()">打印 / 转 PDF</button>
+</div></div>
+
+<div class="wrap">
+
+<div class="hd">
+  <p class="eyebrow">DC-EGO-S2-2026-01 · 附件一 · 需求配置表</p>
+  <h1>具身智能训练数据 · 客户需求勾选单</h1>
+  <p class="sub">由数据需方（客户）勾选。本表勾选结果即作为《数据契约》技术附件与正式报价的输入，未勾选视为「暂不要求」。</p>
+  <div class="meta">
+    <div><label>客户 / 单位名称</label><input id="m1" placeholder="请填写"></div>
+    <div><label>填表人 / 联系方式</label><input id="m2" placeholder="请填写"></div>
+    <div><label>填表日期</label><input id="m3" placeholder="____年__月__日"></div>
+    <div><label>项目编号 / 版本</label><input id="m4" value="DC-EGO-S2-2026-01 / v1.0"></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>填写说明（3 条）</b>
+  <ol>
+    <li>标 <span class="rec">建议</span> 的是通用基线，可直接改；标 <span class="alert">注意</span> 的涉及已知技术风险，改动请在备注栏写明。</li>
+    <li>选项只描述「要什么」，<b>不含任何价格</b>；单价、批量、账期由双方另行商务确认。</li>
+    <li>每题可勾「其他 / 待定」并手写；全部勾完点顶部「生成配置摘要」，可复制回传或打印签字。</li>
+  </ol>
+</div>
+
+<!-- A -->
+<section class="grp" data-g="A" data-title="用途与数据等级">
+  <h2><span class="gn">A</span>用途与数据等级 <em>这一组决定后续所有默认值</em></h2>
+
+  <div class="q" data-q="A1">
+    <div class="qh"><span class="qn">A1</span><span class="qt">这批数据用在训练链路的哪一段？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="A1" value="预训练 / 世界模型"> 预训练 / 世界模型</label>
+      <label class="opt"><input type="checkbox" name="A1" value="中训练 · 动作标签生成" data-rec="1"> 中训练 · 动作标签生成 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="A1" value="后训练 / 真机对齐"> 后训练 / 真机对齐</label>
+      <label class="opt"><input type="checkbox" name="A1" value="能力评测基准"> 能力评测基准</label>
+      <label class="opt"><input type="checkbox" name="A1" value="专项高价值技能数据"> 专项高价值技能数据</label>
+      <label class="opt"><input type="checkbox" name="A1" value="暂未确定 / 由供方建议"> 暂未确定 / 由供方建议</label>
+    </div>
+    <div class="other">其他 / 待定：<input class="q-other" data-q="A1" placeholder="请写明"></div>
+    <div class="hint"><span class="lb tip">提示</span>选「预训练」偏规模与多样性；选「动作标签 / 评测」偏几何真值与精度，两条路线配置差别很大。</div>
+  </div>
+
+  <div class="q" data-q="A2">
+    <div class="qh"><span class="qn">A2</span><span class="qt">采购的数据等级？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="A2" value="L1 素材级（视频 + 基础元信息）"> L1 素材级（视频 + 基础元信息）</label>
+      <label class="opt"><input type="radio" name="A2" value="L2 训练级（默认采购档）" data-rec="1"> L2 训练级 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="A2" value="L3 真值 / 评测级"> L3 真值 / 评测级</label>
+      <label class="opt"><input type="radio" name="A2" value="分档采购（L1+L2 混合）"> 分档采购（L1 + L2 混合）</label>
+    </div>
+    <div class="hint"><span class="lb cost">影响成本</span>L3 需要逐台标定、置信度 mask、下游实测通过率举证，验收与单价都要单独谈。</div>
+  </div>
+
+  <div class="q" data-q="A3">
+    <div class="qh"><span class="qn">A3</span><span class="qt">数据去向？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="A3" value="仅内部自用 / 研发" data-rec="1"> 仅内部自用 / 研发 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="A3" value="对外交付 / 交易"> 对外交付 / 交易</label>
+      <label class="opt"><input type="radio" name="A3" value="两者都有"> 两者都有</label>
+      <label class="opt"><input type="radio" name="A3" value="未定"> 未定</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>对外交易会触发授权链、隐私脱敏与合规举证要求；内部自用可简化，但不等于可以免授权。</div>
+  </div>
+
+  <div class="q" data-q="A4">
+    <div class="qh"><span class="qn">A4</span><span class="qt">是否已有明确的下游验收方（模型厂）？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="A4" value="已有书面需求 / 格式要求"> 已有书面需求 / 格式要求</label>
+      <label class="opt"><input type="radio" name="A4" value="有意向，尚未定格式"> 有意向，尚未定格式</label>
+      <label class="opt"><input type="radio" name="A4" value="暂无，先按通用基线采"> 暂无，先按通用基线采</label>
+      <label class="opt"><input type="radio" name="A4" value="需供方协助对接"> 需供方协助对接</label>
+    </div>
+    <div class="other">下游单位 / 格式文件编号：<input class="q-other" data-q="A4" placeholder="请写明"></div>
+    <div class="hint"><span class="lb hard">硬约束</span>没有书面格式确认就量产，是最常见的返工原因。建议签约前补齐。</div>
+  </div>
+</section>
+
+<!-- B -->
+<section class="grp pb" data-g="B" data-title="视觉与成像规格">
+  <h2><span class="gn">B</span>视觉与成像规格 <em>决定设备选型、带宽与存储</em></h2>
+
+  <div class="q" data-q="B1">
+    <div class="qh"><span class="qn">B1</span><span class="qt">视角数量与布置？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B1" value="单目"> 单目</label>
+      <label class="opt"><input type="radio" name="B1" value="双目（头部）" data-rec="1"> 双目（头部）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B1" value="双目 + 腕部相机"> 双目 + 腕部相机</label>
+      <label class="opt"><input type="radio" name="B1" value="多目阵列（3 目以上）"> 多目阵列（3 目以上）</label>
+    </div>
+    <div class="hint"><span class="lb cost">影响成本</span>目数每翻倍，存储与无线并发近似线性翻倍；加腕部相机主要解决近距遮挡，收益常大于头部加目。</div>
+  </div>
+
+  <div class="q" data-q="B2">
+    <div class="qh"><span class="qn">B2</span><span class="qt">快门类型？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="B2" value="GS 全局快门" data-rec="1"> GS 全局快门 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B2" value="RS 同步锁相卷帘（须 lockstep）"> RS 同步锁相卷帘（须 lockstep）</label>
+      <label class="opt"><input type="radio" name="B2" value="混合：GS 做几何 + RS 做素材"> 混合：GS 做几何 + RS 做素材</label>
+      <label class="opt"><input type="radio" name="B2" value="由供方按场景推荐"> 由供方按场景推荐</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>要 3D 轨迹 / 度量深度 / 动作标签，GS 是准入门槛；只要慢场景视频素材，锁相卷帘可省。GS 不消除运动模糊，也不等于左右目同步。</div>
+  </div>
+
+  <div class="q" data-q="B3">
+    <div class="qh"><span class="qn">B3</span><span class="qt">单路分辨率？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B3" value="1920×1080"> 1920×1080</label>
+      <label class="opt"><input type="radio" name="B3" value="1920×1200" data-rec="1"> 1920×1200 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B3" value="2160×2160"> 2160×2160</label>
+      <label class="opt"><input type="radio" name="B3" value="3840×2160 (4K)"> 3840×2160 (4K)</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="B4">
+    <div class="qh"><span class="qn">B4</span><span class="qt">帧率？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B4" value="30 fps"> 30 fps</label>
+      <label class="opt"><input type="radio" name="B4" value="60 fps" data-rec="1"> 60 fps <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B4" value="120 fps"> 120 fps</label>
+      <label class="opt"><input type="radio" name="B4" value="按任务分档"> 按任务分档</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="B5">
+    <div class="qh"><span class="qn">B5</span><span class="qt">双目基线？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B5" value="63 mm（人眼基线）" data-rec="1"> 63 mm（人眼基线）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B5" value="80 mm"> 80 mm</label>
+      <label class="opt"><input type="radio" name="B5" value="120 mm 及以上"> 120 mm 及以上</label>
+      <label class="opt"><input type="radio" name="B5" value="可更换 / 多档"> 可更换 / 多档</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>Ego 操作多在 0.3~0.8 m；基线加大抬高最近可测距离、压缩近脸重叠视场，需与 B6 一起看。</div>
+  </div>
+
+  <div class="q" data-q="B6">
+    <div class="qh"><span class="qn">B6</span><span class="qt">水平视场角 FOV？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="B6" value="约 90°" data-rec="1"> 约 90° <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B6" value="约 120°"> 约 120°</label>
+      <label class="opt"><input type="radio" name="B6" value="150° 以上 / 鱼眼环视"> 150° 以上 / 鱼眼环视</label>
+      <label class="opt"><input type="radio" name="B6" value="由供方定"> 由供方定</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="B7">
+    <div class="qh"><span class="qn">B7</span><span class="qt">深度信息来源？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="B7" value="双目视差深度（被动）" data-rec="1"> 双目视差深度（被动）<i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="B7" value="额外 ToF / 深度传感器"> 额外 ToF / 深度传感器</label>
+      <label class="opt"><input type="checkbox" name="B7" value="主动结构光 / 红外投射"> 主动结构光 / 红外投射 <i class="alert">注意</i></label>
+      <label class="opt"><input type="checkbox" name="B7" value="学习式单目深度（非真值）"> 学习式单目深度（非真值）</label>
+      <label class="opt"><input type="checkbox" name="B7" value="不要深度图，只要 RGB"> 不要深度图，只要 RGB</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>多设备同场时主动投射会互扰，造成大面积废数据。选了主动光必须同时确认 D3。</div>
+  </div>
+
+  <div class="q" data-q="B8">
+    <div class="qh"><span class="qn">B8</span><span class="qt">深度图是否必须带置信度 / 失效区标注？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="B8" value="必须输出置信度或 mask，无效区留空洞、禁止插值填平" data-rec="1"> 必须带 mask，无效区留空洞、禁止插值填平 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B8" value="只要深度图，置信度可选"> 只要深度图，置信度可选</label>
+      <label class="opt"><input type="radio" name="B8" value="不适用（不要深度）"> 不适用（不要深度）</label>
+      <label class="opt"><input type="radio" name="B8" value="需要专门的困难场景失效区域评测集"> 需要困难场景失效区域评测集</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>湿滑反光、透明、弱纹理表面被动立体匹配会大面积失效；带 mask 的失效标注本身可作评测产品。</div>
+  </div>
+
+  <div class="q" data-q="B9">
+    <div class="qh"><span class="qn">B9</span><span class="qt">每路视频码率 / 压缩程度？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="B9" value="8 Mbps（素材级，重压缩）"> 8 Mbps（素材级，重压缩）</label>
+      <label class="opt"><input type="radio" name="B9" value="20~30 Mbps（训练级）" data-rec="1"> 20~30 Mbps（训练级）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="B9" value="30~40 Mbps（高保真训练级）"> 30~40 Mbps（高保真训练级）</label>
+      <label class="opt"><input type="radio" name="B9" value="近无损 / 原始 RAW"> 近无损 / 原始 RAW</label>
+    </div>
+    <div class="hint"><span class="lb cost">影响成本</span>立体匹配依赖细纹理，重压缩会抹掉皮肤与素色桌面纹理。码率直接决定 SSD 容量、无线并发与服务器存储，须同步核算。</div>
+  </div>
+</section>
+
+<!-- C -->
+<section class="grp pb" data-g="C" data-title="时间同步与几何真值">
+  <h2><span class="gn">C</span>时间同步与几何真值 <em>决定数据能否当度量 3D / 动作标签使用</em></h2>
+
+  <div class="q" data-q="C1">
+    <div class="qh"><span class="qn">C1</span><span class="qt">双目曝光同步指标？</span><span class="tag">单选</span><span class="tag hard">红线</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C1" value="σ < 10 µs（最高档）"> σ &lt; 10 µs（最高档）</label>
+      <label class="opt"><input type="radio" name="C1" value="σ < 100 µs，需提供实测直方图" data-rec="1"> σ &lt; 100 µs，需提供实测直方图 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C1" value="小于半帧即可（约 8~16 ms）"> 小于半帧即可（约 8~16 ms）<i class="alert">注意</i></label>
+      <label class="opt"><input type="radio" name="C1" value="不要求实测数字"> 不要求实测数字</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>只写「硬件同步」四个字不接受，要 σ 实测数字与测量方法（LED 频闪事件同时被两路捕获，统计 N 组标准差）。1 ms 偏差在 1 m 处约 12.5 mm 深度误差。</div>
+  </div>
+
+  <div class="q" data-q="C2">
+    <div class="qh"><span class="qn">C2</span><span class="qt">一帧的时间戳取哪一时刻？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C2" value="曝光中点（驱动层硬件打标）" data-rec="1"> 曝光中点（驱动层硬件打标）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C2" value="VSYNC 起始"> VSYNC 起始</label>
+      <label class="opt"><input type="radio" name="C2" value="主机收包时间"> 主机收包时间</label>
+      <label class="opt"><input type="radio" name="C2" value="由供方定义并提供书面说明"> 由供方定义并提供书面说明</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>只读包内时间戳做差值会被总线抖动污染，仅能初筛，不能作为验收依据。</div>
+  </div>
+
+  <div class="q" data-q="C3">
+    <div class="qh"><span class="qn">C3</span><span class="qt">传感器时钟域？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C3" value="双目 + IMU 共用单一振荡器 / 64bit ns 计数器" data-rec="1"> 双目 + IMU 共用单一振荡器 / 计数器 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C3" value="仅双目同源，IMU 独立时钟 + MCU 打标"> 仅双目同源，IMU 独立时钟 + MCU 打标</label>
+      <label class="opt"><input type="radio" name="C3" value="各自时钟，软件事后对齐"> 各自时钟，软件事后对齐</label>
+      <label class="opt"><input type="radio" name="C3" value="不要求"> 不要求</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="C4">
+    <div class="qh"><span class="qn">C4</span><span class="qt">IMU 要求？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C4" value="需要，≥800 Hz，且带硬件 FSYNC/DRDY 引脚" data-rec="1"> 需要，≥800 Hz，带硬件 FSYNC/DRDY <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C4" value="需要，200~400 Hz 即可"> 需要，200~400 Hz 即可</label>
+      <label class="opt"><input type="radio" name="C4" value="需要 ≥1000 Hz（高频动作）"> 需要 ≥1000 Hz（高频动作）</label>
+      <label class="opt"><input type="radio" name="C4" value="不需要 IMU"> 不需要 IMU</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>选型第一硬指标不是精度，是有没有硬件同步引脚；IMU 必须与相机刚性同板、留在头部，放腰部测的是躯干不是头。</div>
+  </div>
+
+  <div class="q" data-q="C5">
+    <div class="qh"><span class="qn">C5</span><span class="qt">IMU 与图像的固定时标偏差 td 如何交付？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C5" value="出厂标定给出，写入逐台标定文件" data-rec="1"> 出厂标定给出，写入逐台标定文件 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C5" value="每次采集写入 sidecar"> 每次采集写入 sidecar</label>
+      <label class="opt"><input type="radio" name="C5" value="需方自行用 Kalibr 等工具估计"> 需方自行用工具估计</label>
+      <label class="opt"><input type="radio" name="C5" value="不要求"> 不要求</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="C6">
+    <div class="qh"><span class="qn">C6</span><span class="qt">需要哪些逐台标定文件？</span><span class="tag">可多选</span><span class="tag hard">红线</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="C6" value="各自内参 K 与畸变参数" data-rec="1"> 各自内参 K 与畸变参数 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="双目外参 R / t 与基线 b" data-rec="1"> 双目外参 R / t 与基线 b <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="重投影 RMS 报告" data-rec="1"> 重投影 RMS 报告 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="极线校正矩阵 / Q 矩阵"> 极线校正矩阵 / Q 矩阵</label>
+      <label class="opt"><input type="checkbox" name="C6" value="相机↔IMU 外参与 td" data-rec="1"> 相机↔IMU 外参与 td <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="C6" value="标定文件哈希绑定设备 ID"> 标定文件哈希绑定设备 ID</label>
+      <label class="opt"><input type="checkbox" name="C6" value="不需要逐台文件（仅批次文件）"> 不需要逐台文件（仅批次文件）</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="C7">
+    <div class="qh"><span class="qn">C7</span><span class="qt">空间精度判据？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C7" value="重投影 RMS < 0.5 px 且极线偏移 < 1 px" data-rec="1"> 重投影 RMS &lt; 0.5 px 且极线偏移 &lt; 1 px <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C7" value="放宽至 RMS < 1 px / 极线 < 2 px"> 放宽至 RMS &lt; 1 px / 极线 &lt; 2 px</label>
+      <label class="opt"><input type="radio" name="C7" value="需 3D 轨迹精度指标（如中位误差 mm）"> 需 3D 轨迹精度指标（mm）</label>
+      <label class="opt"><input type="radio" name="C7" value="不设量化指标"> 不设量化指标</label>
+    </div>
+    <div class="other">指定的 3D 精度门槛：<input class="q-other" data-q="C7" placeholder="如 中位误差 ≤ __ mm"></div>
+  </div>
+
+  <div class="q" data-q="C8">
+    <div class="qh"><span class="qn">C8</span><span class="qt">每场采集前后的标定复核？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C8" value="首末各拍一次标定板 / LED 同步事件" data-rec="1"> 首末各一次标定板 / LED 同步事件 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C8" value="仅开场一次"> 仅开场一次</label>
+      <label class="opt"><input type="radio" name="C8" value="按批次抽复核"> 按批次抽复核</label>
+      <label class="opt"><input type="radio" name="C8" value="不要求"> 不要求</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>漂移超限的 session 可留作单目素材，但不得作为度量 3D 数据交付；这条建议写进 QA 规则。</div>
+  </div>
+
+  <div class="q" data-q="C9">
+    <div class="qh"><span class="qn">C9</span><span class="qt">双目自动曝光 / 增益 / 白平衡？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="C9" value="主从锁定，左右参数一致（左右灰度差 < 5%）" data-rec="1"> 主从锁定，左右一致（灰度差 &lt; 5%）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="C9" value="各自 AE，但曝光起点同步"> 各自 AE，但曝光起点同步</label>
+      <label class="opt"><input type="radio" name="C9" value="不要求"> 不要求</label>
+      <label class="opt"><input type="radio" name="C9" value="由供方定，需提供书面说明"> 由供方定，需提供书面说明</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>只同步触发却让两路各自 AE，等于「起点同步、时长不同步」，立体匹配会把亮度差当纹理，空洞率暴涨。</div>
+  </div>
+</section>
+
+<!-- D -->
+<section class="grp pb" data-g="D" data-title="扩展模态与多设备">
+  <h2><span class="gn">D</span>扩展模态与多设备 <em>决定是否加硬件、是否同场并发</em></h2>
+
+  <div class="q" data-q="D1">
+    <div class="qh"><span class="qn">D1</span><span class="qt">除视频外还需要哪些模态？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="D1" value="腕部相机（近距 / 遮挡补充）"> 腕部相机（近距 / 遮挡补充）</label>
+      <label class="opt"><input type="checkbox" name="D1" value="力 / 触觉（UMI 手套、夹爪）"> 力 / 触觉（UMI 手套、夹爪）</label>
+      <label class="opt"><input type="checkbox" name="D1" value="动作捕捉 / 本体关节状态"> 动捕 / 本体关节状态</label>
+      <label class="opt"><input type="checkbox" name="D1" value="音频"> 音频</label>
+      <label class="opt"><input type="checkbox" name="D1" value="眼动 / 注视点"> 眼动 / 注视点</label>
+      <label class="opt"><input type="checkbox" name="D1" value="均不需要，仅视频 + IMU" data-rec="1"> 均不需要，仅视频 + IMU <i class="rec">建议</i></label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>「捏住」和「捏碎」在画面上可以一样，视觉看不见力；力/触觉往往比再加一个镜头更能抬高数据单价。</div>
+  </div>
+
+  <div class="q" data-q="D2">
+    <div class="qh"><span class="qn">D2</span><span class="qt">附加模态与视频的时间对齐？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="D2" value="统一时钟域硬同步（< 100 µs）" data-rec="1"> 统一时钟域硬同步（&lt; 100 µs）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="D2" value="软件事后对齐（ms 级）"> 软件事后对齐（ms 级）</label>
+      <label class="opt"><input type="radio" name="D2" value="各自独立，时间戳可换算即可"> 各自独立，时间戳可换算即可</label>
+      <label class="opt"><input type="radio" name="D2" value="不适用"> 不适用（未加模态）</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="D3">
+    <div class="qh"><span class="qn">D3</span><span class="qt">是否会有多台设备同场采集？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="D3" value="是，常见 20~40 台同场" data-rec="1"> 是，常见 20~40 台同场 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="D3" value="是，但 10 台以内"> 是，但 10 台以内</label>
+      <label class="opt"><input type="radio" name="D3" value="否，单设备为主"> 否，单设备为主</label>
+      <label class="opt"><input type="radio" name="D3" value="未定"> 未定</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>同场多设备时禁用主动红外 / 结构光（会互扰）；无线回程需按并发台数核算 AP 与信道规划。</div>
+  </div>
+
+  <div class="q" data-q="D4">
+    <div class="qh"><span class="qn">D4</span><span class="qt">设备形态与佩戴？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="D4" value="分体：头部轻量化，处理 / 电池 / 散热在腰部"> 分体：头戴轻，处理 / 电池 / 散热在腰部</label>
+      <label class="opt"><input type="radio" name="D4" value="一体式头戴"> 一体式头戴</label>
+      <label class="opt"><input type="radio" name="D4" value="不限形态，按重量与续航指标验收" data-rec="1"> 不限形态，按指标验收 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="D4" value="由供方推荐"> 由供方推荐</label>
+    </div>
+    <div class="other">头戴重量上限 / 连续工作时长要求：<input class="q-other" data-q="D4" placeholder="如 ≤100 g / ≥8 h"></div>
+    <div class="hint"><span class="lb tip">提示</span>建议按「头戴重量、壳温、续航」三个可测指标验收，不必限定技术路线（分体需 SerDes 长距链路，一体式已有量产整机）。</div>
+  </div>
+</section>
+
+<!-- E -->
+<section class="grp pb" data-g="E" data-title="场景与内容">
+  <h2><span class="gn">E</span>场景与内容 <em>决定采集难度、长尾价值与多样性举证</em></h2>
+
+  <div class="q" data-q="E1">
+    <div class="qh"><span class="qn">E1</span><span class="qt">需要覆盖哪些常规场景？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="E1" value="家居 / 日常起居"> 家居 / 日常起居</label>
+      <label class="opt"><input type="checkbox" name="E1" value="酒店 / 客房保洁"> 酒店 / 客房保洁</label>
+      <label class="opt"><input type="checkbox" name="E1" value="工厂产线 / 装配"> 工厂产线 / 装配</label>
+      <label class="opt"><input type="checkbox" name="E1" value="商超 / 零售 / 理货"> 商超 / 零售 / 理货</label>
+      <label class="opt"><input type="checkbox" name="E1" value="餐饮后厨 / 食品加工"> 餐饮后厨 / 食品加工</label>
+      <label class="opt"><input type="checkbox" name="E1" value="仓储物流 / 分拣"> 仓储物流 / 分拣</label>
+      <label class="opt"><input type="checkbox" name="E1" value="农业 / 采摘"> 农业 / 采摘</label>
+      <label class="opt"><input type="checkbox" name="E1" value="医疗 / 护理"> 医疗 / 护理</label>
+      <label class="opt"><input type="checkbox" name="E1" value="室外 / 开放道路"> 室外 / 开放道路</label>
+      <label class="opt"><input type="checkbox" name="E1" value="按我方任务书指定"> 按我方任务书指定</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>叠衣、打扫、家居、酒店类已被大量采集；「稀奇」不等于值钱，优先补真实产业里不好摆拍的活。</div>
+  </div>
+
+  <div class="q" data-q="E2">
+    <div class="qh"><span class="qn">E2</span><span class="qt">是否需要特殊 / 物理长尾场景？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="E2" value="湿滑 / 反光 / 带水（海鲜水产加工等）"> 湿滑 / 反光 / 带水（水产加工等）</label>
+      <label class="opt"><input type="checkbox" name="E2" value="可变形物体（面团 / 织物 / 丝线 / 泥）"> 可变形物体（面团 / 织物 / 丝线）</label>
+      <label class="opt"><input type="checkbox" name="E2" value="长时程工序（传统技艺 / 非遗）"> 长时程工序（传统技艺 / 非遗）</label>
+      <label class="opt"><input type="checkbox" name="E2" value="精细双手非对称协同"> 精细双手非对称协同</label>
+      <label class="opt"><input type="checkbox" name="E2" value="专业工具使用 / 装配维修"> 专业工具使用 / 装配维修</label>
+      <label class="opt"><input type="checkbox" name="E2" value="透明 / 弱纹理 / 镜面物体"> 透明 / 弱纹理 / 镜面物体</label>
+      <label class="opt"><input type="checkbox" name="E2" value="低温 / 高湿 / 粉尘等特殊工况"> 低温 / 高湿 / 粉尘工况</label>
+      <label class="opt"><input type="checkbox" name="E2" value="暂不需要特殊场景"> 暂不需要特殊场景</label>
+    </div>
+    <div class="other">指定的具体场景 / 工序：<input class="q-other" data-q="E2" placeholder="请写明，便于查重与排产"></div>
+    <div class="hint"><span class="lb cost">影响成本</span>特殊工况常需 IP 防护、防雾、耐低温设备，且被动立体匹配在湿滑反光表面易失效；建议先做小规模实测再扩产能。</div>
+  </div>
+
+  <div class="q" data-q="E3">
+    <div class="qh"><span class="qn">E3</span><span class="qt">是否需要失败 / 纠错 / 负样本？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="E3" value="必须包含，并单独标注" data-rec="1"> 必须包含，并单独标注 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="E3" value="可有可无"> 可有可无</label>
+      <label class="opt"><input type="radio" name="E3" value="不需要，只要成功轨迹"> 不需要，只要成功轨迹</label>
+      <label class="opt"><input type="radio" name="E3" value="按场景定"> 按场景定</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="E4">
+    <div class="qh"><span class="qn">E4</span><span class="qt">多样性举证要求？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="E4" value="提供任务 / 物体 / 环境 / 采集员计数统计" data-rec="1"> 提供任务 / 物体 / 环境计数统计 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="E4" value="提供场景与长尾分布表"> 提供场景与长尾分布表</label>
+      <label class="opt"><input type="checkbox" name="E4" value="限制单一采集员 / 单一设备占比"> 限制单一采集员 / 设备占比</label>
+      <label class="opt"><input type="checkbox" name="E4" value="不要求统计"> 不要求统计</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>现行行业数据集质量标准含「多样性」维度，需可举证；「精选样片」不能替代全量分布统计。</div>
+  </div>
+
+  <div class="q" data-q="E5">
+    <div class="qh"><span class="qn">E5</span><span class="qt">单场景采集时长上限？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="E5" value="≤ 150 小时 / 场景" data-rec="1"> ≤ 150 小时 / 场景 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="E5" value="按我方指定时长"> 按我方指定时长</label>
+      <label class="opt"><input type="radio" name="E5" value="不设上限"> 不设上限</label>
+      <label class="opt"><input type="radio" name="E5" value="由供方建议"> 由供方建议</label>
+    </div>
+    <div class="other">指定时长：<input class="q-other" data-q="E5" placeholder="__ 小时 / 场景"></div>
+  </div>
+</section>
+
+<!-- F -->
+<section class="grp pb" data-g="F" data-title="交付格式与标签">
+  <h2><span class="gn">F</span>交付格式与标签 <em>决定下游能否直接入训练管线</em></h2>
+
+  <div class="q" data-q="F1">
+    <div class="qh"><span class="qn">F1</span><span class="qt">归档容器 / 数据集格式？</span><span class="tag">可多选</span><span class="tag hard">红线</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F1" value="MCAP（原始时标归档副本）" data-rec="1"> MCAP（原始时标归档副本）<i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F1" value="LeRobot v3"> LeRobot v3</label>
+      <label class="opt"><input type="checkbox" name="F1" value="RLDS / Open X-Embodiment"> RLDS / Open X-Embodiment</label>
+      <label class="opt"><input type="checkbox" name="F1" value="ROS 2 bag"> ROS 2 bag</label>
+      <label class="opt"><input type="checkbox" name="F1" value="供方自定义格式（需提供解析库）"> 供方自定义（需解析库）</label>
+    </div>
+    <div class="other">指定的内部格式 / 版本号：<input class="q-other" data-q="F1" placeholder="请写明"></div>
+    <div class="hint"><span class="lb hard">硬约束</span>归档副本不可让：格式升级不能毁掉原始时标。若下游格式未定，至少先锁 MCAP 归档。</div>
+  </div>
+
+  <div class="q" data-q="F2">
+    <div class="qh"><span class="qn">F2</span><span class="qt">视频编码？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="F2" value="H.265 / HEVC" data-rec="1"> H.265 / HEVC <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="F2" value="H.264 / AVC"> H.264 / AVC</label>
+      <label class="opt"><input type="radio" name="F2" value="近无损帧内编码"> 近无损帧内编码</label>
+      <label class="opt"><input type="radio" name="F2" value="原始 RAW / 未压缩"> 原始 RAW / 未压缩</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="F3">
+    <div class="qh"><span class="qn">F3</span><span class="qt">需要哪些标签 / 真值？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F3" value="2D 手部关键点"> 2D 手部关键点</label>
+      <label class="opt"><input type="checkbox" name="F3" value="3D 手部 / 腕部轨迹" data-rec="1"> 3D 手部 / 腕部轨迹 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F3" value="6DoF 头部位姿 / SLAM 轨迹" data-rec="1"> 6DoF 头部位姿 / 轨迹 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F3" value="深度图 / 点云 + 置信度"> 深度图 / 点云 + 置信度</label>
+      <label class="opt"><input type="checkbox" name="F3" value="动作 / 技能语义标签"> 动作 / 技能语义标签</label>
+      <label class="opt"><input type="checkbox" name="F3" value="成败 / 质量标注"> 成败 / 质量标注</label>
+      <label class="opt"><input type="checkbox" name="F3" value="时序工序分解 / 步骤边界"> 时序工序分解 / 步骤边界</label>
+      <label class="opt"><input type="checkbox" name="F3" value="物体框 / 类别 / 属性"> 物体框 / 类别 / 属性</label>
+      <label class="opt"><input type="checkbox" name="F3" value="力 / 触觉通道（若 D1 选了）"> 力 / 触觉通道</label>
+      <label class="opt"><input type="checkbox" name="F3" value="只要原始视频，不做标注"> 只要原始视频，不做标注</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="F4">
+    <div class="qh"><span class="qn">F4</span><span class="qt">每帧必备元信息？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F4" value="frame_id / 序列号 / 触发计数" data-rec="1"> frame_id / 序列号 / 触发计数 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="曝光中点单调时标（ns）" data-rec="1"> 曝光中点单调时标（ns）<i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="exposure_us / 增益 / 白平衡" data-rec="1"> exposure_us / 增益 / 白平衡 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="设备 ID / session ID" data-rec="1"> 设备 ID / session ID <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F4" value="标定文件哈希"> 标定文件哈希</label>
+      <label class="opt"><input type="checkbox" name="F4" value="采集员 / 场景 / 任务编码"> 采集员 / 场景 / 任务编码</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="F5">
+    <div class="qh"><span class="qn">F5</span><span class="qt">坐标系与单位约定？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="F5" value="需书面统一约定，并提供到机器人坐标系的变换" data-rec="1"> 书面统一约定 + 变换矩阵 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="F5" value="沿用供方默认，但需文档说明"> 沿用供方默认，需文档说明</label>
+      <label class="opt"><input type="radio" name="F5" value="不要求"> 不要求</label>
+      <label class="opt"><input type="radio" name="F5" value="按我方坐标系定义（另附）"> 按我方坐标系定义（另附）</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="F6">
+    <div class="qh"><span class="qn">F6</span><span class="qt">随数据交付哪些文件？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="F6" value="逐 session manifest（清单 + 校验和）" data-rec="1"> 逐 session manifest <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="QA 日报 / 批次质检报告" data-rec="1"> QA 日报 / 批次质检报告 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="质检脚本（可复跑）" data-rec="1"> 质检脚本（可复跑）<i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="统计分母可按采购方口径复算" data-rec="1"> 统计分母可复算 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="F6" value="数据字典 / Schema 说明"> 数据字典 / Schema 说明</label>
+      <label class="opt"><input type="checkbox" name="F6" value="SDK / 读取示例代码"> SDK / 读取示例代码</label>
+    </div>
+  </div>
+</section>
+
+<!-- G -->
+<section class="grp pb" data-g="G" data-title="质检与验收">
+  <h2><span class="gn">G</span>质检与验收 <em>决定「什么算合格」以及不合格怎么办</em></h2>
+
+  <div class="q" data-q="G1">
+    <div class="qh"><span class="qn">G1</span><span class="qt">验收依据？</span><span class="tag">可多选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="checkbox" name="G1" value="现行行业数据集质量标准（八维）" data-rec="1"> 现行行业数据集质量标准（八维）<i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="G1" value="双方约定的质量 SLA / 本表 C 组指标" data-rec="1"> 双方约定 SLA / 本表指标 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="G1" value="下游模型厂实测通过率"> 下游模型厂实测通过率</label>
+      <label class="opt"><input type="checkbox" name="G1" value="仅按供方出厂检验"> 仅按供方出厂检验</label>
+    </div>
+    <div class="other">指定的标准号 / 版本：<input class="q-other" data-q="G1" placeholder="签约时以标准正式文本为准"></div>
+  </div>
+
+  <div class="q" data-q="G2">
+    <div class="qh"><span class="qn">G2</span><span class="qt">抽样方式？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="G2" value="随机抽样 ≥ 5%（需方可指定批次）" data-rec="1"> 随机抽样 ≥ 5%（需方指定批次）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="G2" value="全量自动检测 + 人工抽复核"> 全量自动检测 + 人工抽复核</label>
+      <label class="opt"><input type="radio" name="G2" value="仅看供方精选样片"> 仅看供方精选样片 <i class="alert">注意</i></label>
+      <label class="opt"><input type="radio" name="G2" value="全量逐条验收"> 全量逐条验收</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>建议写明「精选样片不作验收依据」，否则质量分布无法举证。</div>
+  </div>
+
+  <div class="q" data-q="G3">
+    <div class="qh"><span class="qn">G3</span><span class="qt">有效率 / 废片率门槛？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="G3" value="书面约定上限，且分母可按我方口径复算" data-rec="1"> 书面约定上限 + 分母可复算 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="G3" value="由供方声明，我方抽核"> 由供方声明，我方抽核</label>
+      <label class="opt"><input type="radio" name="G3" value="不设门槛"> 不设门槛</label>
+      <label class="opt"><input type="radio" name="G3" value="按有效数据量结算，不设废片率"> 按有效量结算，不设废片率</label>
+    </div>
+    <div class="other">约定的有效率下限：<input class="q-other" data-q="G3" placeholder="如 ≥ __ %"></div>
+  </div>
+
+  <div class="q" data-q="G4">
+    <div class="qh"><span class="qn">G4</span><span class="qt">不合格处理方式？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="G4" value="剔除后重新交付" data-rec="1"> 剔除后重新交付 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="G4" value="按有效数据量折价"> 按有效数据量折价</label>
+      <label class="opt"><input type="checkbox" name="G4" value="整批重采"> 整批重采</label>
+      <label class="opt"><input type="checkbox" name="G4" value="设书面争议期 + 复检机制" data-rec="1"> 书面争议期 + 复检机制 <i class="rec">建议</i></label>
+    </div>
+  </div>
+
+  <div class="q" data-q="G5">
+    <div class="qh"><span class="qn">G5</span><span class="qt">是否要求试产样片先行验收？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="G5" value="是，先交小批试产样片，通过后再放量" data-rec="1"> 是，先小批试产验收再放量 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="G5" value="是，但需要下游模型厂实测反馈"> 是，需下游模型厂实测反馈</label>
+      <label class="opt"><input type="radio" name="G5" value="不需要，直接批量交付"> 不需要，直接批量交付</label>
+      <label class="opt"><input type="radio" name="G5" value="未定"> 未定</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>先做 L0 小批实测（废片率、同步 σ、下游可用性）再放量，是控制返工最有效的一道门。</div>
+  </div>
+</section>
+
+<!-- H -->
+<section class="grp pb" data-g="H" data-title="合规与商务边界">
+  <h2><span class="gn">H</span>合规与商务边界 <em>不含价格；只确认权责与计价口径</em></h2>
+
+  <div class="q" data-q="H1">
+    <div class="qh"><span class="qn">H1</span><span class="qt">隐私与授权需要哪些？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="H1" value="采集员书面授权" data-rec="1"> 采集员书面授权 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="H1" value="场景 / 场地方授权" data-rec="1"> 场景 / 场地方授权 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="H1" value="人脸 / 车牌 / 屏幕信息脱敏"> 人脸 / 车牌 / 屏幕脱敏</label>
+      <label class="opt"><input type="checkbox" name="H1" value="第三方肖像与商业秘密排查"> 第三方肖像与商密排查</label>
+      <label class="opt"><input type="checkbox" name="H1" value="告知文本由我方提供"> 告知文本由我方提供</label>
+      <label class="opt"><input type="checkbox" name="H1" value="告知文本由供方提供"> 告知文本由供方提供</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="H2">
+    <div class="qh"><span class="qn">H2</span><span class="qt">数据权属与商业授权？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H2" value="需方独占"> 需方独占</label>
+      <label class="opt"><input type="radio" name="H2" value="需方可使用并转授"> 需方可使用并转授</label>
+      <label class="opt"><input type="radio" name="H2" value="供方保留部分权利"> 供方保留部分权利</label>
+      <label class="opt"><input type="radio" name="H2" value="待商务谈判"> 待商务谈判</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="H3">
+    <div class="qh"><span class="qn">H3</span><span class="qt">数据是否涉及出境？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H3" value="仅境内存储与使用" data-rec="1"> 仅境内存储与使用 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="H3" value="可能出境"> 可能出境</label>
+      <label class="opt"><input type="radio" name="H3" value="未定"> 未定</label>
+      <label class="opt"><input type="radio" name="H3" value="不适用"> 不适用</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="H4">
+    <div class="qh"><span class="qn">H4</span><span class="qt">本契约是否包含采集员劳务计酬？</span><span class="tag">单选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="radio" name="H4" value="不包含，仅为数据采购；计酬另立" data-rec="1"> 不包含，仅为数据采购；计酬另立 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="H4" value="包含按有效时长计酬"> 包含按有效时长计酬</label>
+      <label class="opt"><input type="radio" name="H4" value="包含，但只需单设备时长统计 / 计时" > 包含，但只需单设备时长统计</label>
+      <label class="opt"><input type="radio" name="H4" value="待定"> 待定</label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>数据采购价款与采集员劳务计酬是两笔钱、两个主体，建议分开签；若需「有效时长」，还要定义质量判定与申诉规则。</div>
+  </div>
+
+  <div class="q" data-q="H5">
+    <div class="qh"><span class="qn">H5</span><span class="qt">计价单元？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H5" value="按有效时长（小时）"> 按有效时长（小时）</label>
+      <label class="opt"><input type="radio" name="H5" value="按原始采集时长（小时）"> 按原始采集时长（小时）</label>
+      <label class="opt"><input type="radio" name="H5" value="按帧 / 条 / episode"> 按帧 / 条 / episode</label>
+      <label class="opt"><input type="radio" name="H5" value="按 session / 项目包"> 按 session / 项目包</label>
+      <label class="opt"><input type="radio" name="H5" value="待商务谈判" data-rec="1"> 待商务谈判 <i class="rec">建议</i></label>
+    </div>
+    <div class="hint"><span class="lb tip">提示</span>本表不涉及任何单价；计价单元确定后，双方另附报价单。</div>
+  </div>
+
+  <div class="q" data-q="H6">
+    <div class="qh"><span class="qn">H6</span><span class="qt">交付与部署方式？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="H6" value="私有化本地交付 / 现场服务器" data-rec="1"> 私有化本地交付 / 现场服务器 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="H6" value="供方云平台交付"> 供方云平台交付</label>
+      <label class="opt"><input type="radio" name="H6" value="混合（现场采集 + 云端管理）"> 混合（现场采集 + 云端管理）</label>
+      <label class="opt"><input type="radio" name="H6" value="硬盘 / 介质物理交付"> 硬盘 / 介质物理交付</label>
+    </div>
+    <div class="hint"><span class="lb hard">硬约束</span>若选私有化，须确认设备厂的管理 / 上传 Pipeline 能否完整私有化部署，这条直接决定现场服务器方案能否落地。</div>
+  </div>
+</section>
+
+<!-- I -->
+<section class="grp pb" data-g="I" data-title="规模、节奏与配套">
+  <h2><span class="gn">I</span>规模、节奏与配套 <em>决定排产、服务器套数与交付里程碑</em></h2>
+
+  <div class="q" data-q="I1">
+    <div class="qh"><span class="qn">I1</span><span class="qt">首批规模？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="I1" value="20~40 台 / 套（验证批）" data-rec="1"> 20~40 台 / 套（验证批）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="I1" value="200 台 / 套"> 200 台 / 套</label>
+      <label class="opt"><input type="radio" name="I1" value="200 台以上"> 200 台以上</label>
+      <label class="opt"><input type="radio" name="I1" value="先验证批，通过后再定"> 先验证批，通过后再定</label>
+    </div>
+    <div class="other">明确数量：<input class="q-other" data-q="I1" placeholder="__ 台"></div>
+  </div>
+
+  <div class="q" data-q="I2">
+    <div class="qh"><span class="qn">I2</span><span class="qt">现场服务器 / 采集场景数？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="I2" value="1 套（试点）" data-rec="1"> 1 套（试点）<i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="I2" value="5 套（按 40 台/套）"> 5 套（按 40 台 / 套）</label>
+      <label class="opt"><input type="radio" name="I2" value="按实际场景数确定"> 按实际场景数确定</label>
+      <label class="opt"><input type="radio" name="I2" value="由供方配套，我方只验功能"> 由供方配套，我方只验功能</label>
+    </div>
+    <div class="other">场景数 / 每场景设备数：<input class="q-other" data-q="I2" placeholder="请写明"></div>
+  </div>
+
+  <div class="q" data-q="I3">
+    <div class="qh"><span class="qn">I3</span><span class="qt">服务器端功能范围？</span><span class="tag">可多选</span></div>
+    <div class="opts two">
+      <label class="opt"><input type="checkbox" name="I3" value="接收采集终端数据传输" data-rec="1"> 接收终端数据传输 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="I3" value="单设备采集时长统计 / 计时" data-rec="1"> 单设备时长统计 / 计时 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="I3" value="视频清洗与检验"> 视频清洗与检验</label>
+      <label class="opt"><input type="checkbox" name="I3" value="质量系数 / 有效时长判定"> 质量系数 / 有效时长判定</label>
+      <label class="opt"><input type="checkbox" name="I3" value="计酬账本 / 申诉仲裁"> 计酬账本 / 申诉仲裁</label>
+      <label class="opt"><input type="checkbox" name="I3" value="看板 / 导出 / 批量设备管理"> 看板 / 导出 / 批量设备管理</label>
+      <label class="opt"><input type="checkbox" name="I3" value="多视角 → 3D 标签转换"> 多视角 → 3D 标签转换</label>
+    </div>
+    <div class="hint"><span class="lb cost">影响成本</span>「传输 + 计时」与「+ 清洗检验」是两套不同的软件与硬件配置，建议分阶段勾选、分阶段报价。</div>
+  </div>
+
+  <div class="q" data-q="I4">
+    <div class="qh"><span class="qn">I4</span><span class="qt">交付节奏？</span><span class="tag">单选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="I4" value="分批：验证批 → 量产批" data-rec="1"> 分批：验证批 → 量产批 <i class="rec">建议</i></label>
+      <label class="opt"><input type="radio" name="I4" value="一次性交付"> 一次性交付</label>
+      <label class="opt"><input type="radio" name="I4" value="按里程碑 / 按场景滚动"> 按里程碑 / 按场景滚动</label>
+      <label class="opt"><input type="radio" name="I4" value="待定"> 待定</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="I5">
+    <div class="qh"><span class="qn">I5</span><span class="qt">需要哪些配套文档 / 服务？</span><span class="tag">可多选</span></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="I5" value="设备规格书 / 参数实测报告" data-rec="1"> 设备规格书 / 参数实测报告 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="I5" value="SDK / API 文档"> SDK / API 文档</label>
+      <label class="opt"><input type="checkbox" name="I5" value="标定报告样例 / 样例数据" data-rec="1"> 标定报告样例 / 样例数据 <i class="rec">建议</i></label>
+      <label class="opt"><input type="checkbox" name="I5" value="部署与运维手册"> 部署与运维手册</label>
+      <label class="opt"><input type="checkbox" name="I5" value="现场培训 / 联调支持"> 现场培训 / 联调支持</label>
+      <label class="opt"><input type="checkbox" name="I5" value="质保与备件条款"> 质保与备件条款</label>
+    </div>
+  </div>
+
+  <div class="q" data-q="I6">
+    <div class="qh"><span class="qn">I6</span><span class="qt">其他补充要求 / 备注</span><span class="tag">填写</span></div>
+    <div class="other" style="margin-top:2px">补充：<input class="q-other" data-q="I6" placeholder="如特殊验收条件、禁用技术、交付禁令等"></div>
+  </div>
+</section>
+
+<!-- summary -->
+<div id="summary">
+  <h2>配置摘要 · 可直接复制回传</h2>
+  <p class="sd">以下为本表勾选结果，作为《数据契约》技术附件与正式报价的输入；标【未勾选】的项目请补全或书面确认「暂不要求」。</p>
+  <div id="out"></div>
+  <div class="missing" id="missing"></div>
+  <div class="srow">
+    <button class="primary" onclick="copySummary(this)">复制摘要</button>
+    <button onclick="window.print()">打印本表</button>
+    <button onclick="document.getElementById('summary').style.display='none'">收起摘要</button>
+  </div>
+</div>
+
+<div class="sign">
+  <div>
+    <div class="lb">数据需方（客户）确认</div>
+    <div class="box"></div>
+    <div class="cap">签字 / 盖章：　　　　　　　　　日期：</div>
+  </div>
+  <div>
+    <div class="lb">数据供方接收确认</div>
+    <div class="box"></div>
+    <div class="cap">签字 / 盖章：　　　　　　　　　日期：</div>
+  </div>
+</div>
+<p class="foot">DC-EGO-S2-2026-01 附件一 · v1.0 · 本表仅描述需求，不含价格；勾选结果需双方书面确认后生效</p>
+
+</div>
+
+<script>
+const KEY = 'ego_s2_dc_checklist_v1';
+const $  = s => document.querySelectorAll(s);
+
+function state(){
+  const d = {sel:{}, txt:{}};
+  $('input[type=radio],input[type=checkbox]').forEach(i=>{
+    if(i.checked) (d.sel[i.name] = d.sel[i.name] || []).push(i.value);
+  });
+  $('input[type=text], input:not([type])').forEach(i=>{
+    if(i.id || i.dataset.q) d.txt[i.id || ('q:'+i.dataset.q)] = i.value;
+  });
+  return d;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state())); }catch(e){} update(); }
+function restore(){
+  let d; try{ d = JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ d=null; }
+  if(!d){ update(); return; }
+  const sel = d.sel||{}, txt = d.txt||{};
+  $('input[type=radio],input[type=checkbox]').forEach(i=>{
+    i.checked = (sel[i.name]||[]).includes(i.value);
+  });
+  Object.entries(txt).forEach(([k,v])=>{
+    const el = k.startsWith('q:')
+      ? document.querySelector('input.q-other[data-q="'+k.slice(2)+'"]')
+      : document.getElementById(k);
+    if(el) el.value = v;
+  });
+  update();
+}
+function update(){
+  const qs = $('.q'); let done = 0;
+  qs.forEach(q=>{
+    const c = q.querySelectorAll('input:checked').length;
+    const o = q.querySelector('input.q-other');
+    if(c > 0 || (o && o.value.trim())) done++;
+  });
+  document.getElementById('prog').textContent = '已勾 ' + done + ' / ' + qs.length + ' 题';
+  document.getElementById('barfill').style.width = (done/qs.length*100).toFixed(1)+'%';
+}
+function fillRec(){
+  $('.q').forEach(q=>{
+    const rec = [...q.querySelectorAll('input[data-rec="1"]')];
+    if(!rec.length) return;
+    if(rec[0].type === 'radio'){
+      if(!q.querySelector('input:checked')) rec[0].checked = true;
+    }else{
+      if(!q.querySelector('input:checked')) rec.forEach(i=>i.checked = true);
+    }
+  });
+  save();
+}
+function clearAll(){
+  if(!confirm('确认清空本表所有勾选与填写内容？')) return;
+  $('input[type=radio],input[type=checkbox]').forEach(i=>i.checked=false);
+  $('input[type=text], input:not([type])').forEach(i=>{ if(i.id!=='m4') i.value=''; });
+  save();
+}
+function buildSummary(){
+  const L=[];
+  const gv = k => (document.getElementById(k)||{}).value || '';
+  L.push('EGO-S2 具身训练数据 · 客户需求配置摘要');
+  L.push('客户：'+ (gv('m1')||'【未填】') + '　填表人：'+ (gv('m2')||'【未填】') + '　日期：'+ (gv('m3')||'【未填】'));
+  L.push('编号：'+ (gv('m4')||''));
+  let missing = 0;
+  $('.grp').forEach(g=>{
+    L.push('');
+    L.push('【'+g.dataset.g+' · '+g.dataset.title+'】');
+    g.querySelectorAll('.q').forEach(q=>{
+      const qt = q.querySelector('.qt').textContent.trim();
+      const picked = [...q.querySelectorAll('input:checked')].map(i=>i.value);
+      const o = q.querySelector('input.q-other');
+      const extra = o && o.value.trim() ? '其他/备注：'+o.value.trim() : '';
+      const parts = picked.concat(extra?[extra]:[]);
+      if(!parts.length){ missing++; L.push('  '+q.dataset.q+' '+qt+' → 【未勾选】'); }
+      else L.push('  '+q.dataset.q+' '+qt+' → '+parts.join('、'));
+    });
+  });
+  L.push('');
+  L.push('说明：本摘要仅描述需求配置，不含价格；单价、批量、账期由双方另行商务确认。');
+  document.getElementById('out').textContent = L.join('\n');
+  const m = document.getElementById('missing');
+  m.textContent = missing ? ('⚠ 还有 '+missing+' 题未勾选，请补全或书面确认「暂不要求」。') : '✓ 全部题目已填写。';
+  document.getElementById('summary').style.display='block';
+  document.getElementById('summary').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function copySummary(btn){
+  const t = document.getElementById('out').textContent;
+  const done = ()=>{ const b=btn; const o=b.textContent; b.textContent='已复制 ✓'; setTimeout(()=>b.textContent=o,1500); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallback(t,done));
+  }else fallback(t,done);
+}
+function fallback(t,cb){
+  const a=document.createElement('textarea'); a.value=t; document.body.appendChild(a);
+  a.select(); try{document.execCommand('copy'); cb();}catch(e){alert('复制失败，请手动选中摘要文本复制。');}
+  a.remove();
+}
+document.addEventListener('change', e=>{ if(e.target.matches('input')) save(); });
+document.addEventListener('input',  e=>{ if(e.target.matches('input[type=text],input:not([type])')) save(); });
+restore();
+</script>
+</body>
+</html>
