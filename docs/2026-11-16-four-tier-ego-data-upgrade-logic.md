@@ -1,0 +1,17 @@
+# Four Tiers of Ego Data: From Viewable to Evaluatable
+
+The most misunderstood word in embodied-AI data collection is "hours." A stock of 160,000+ hours of real-world stereo ego video sounds substantial — but if you can't tell which tier each segment belongs to, the number says almost nothing. Between "a video that plays" and "a video that trains" sit six gates: calibration, synchronization, bitrate, quality control, labels, and an evaluation protocol.
+
+We divide ego data into four tiers; each tier contains every requirement of the tiers below it.
+
+**Viewable (L0).** The two video streams decode and play back correctly and can be browsed by a human. Geometric calibration, exposure synchronization, IMU, and metadata may all be relaxed. This tier serves scene inventory, demos, rough screening, and material pre-selection — it answers "what did we actually capture?" It must not be used for any training or evaluation.
+
+**Material (L1).** On top of viewability, each unit carries per-device intrinsics/extrinsics, timestamps, IMU, and a complete raw archive package, with synchronization meeting a basic threshold (σ < 1 ms). There is no systematic quality control and no labels, so it still cannot train directly. Its value is re-processability: it is the semi-finished input for a training set, available for offline selection and later upgrade.
+
+**Training (L2).** This is the first hard gate. Synchronization, per-device calibration, near-lossless bitrate, per-frame metadata, QC thresholds, and 2D/3D hand and action labels must all be in place. Consider synchronization alone: L0 has no requirement on stereo exposure alignment σ; L1 relaxes to σ < 1 ms; L2 demands σ < 100 µs with a histogram, ideally < 10 µs. Shutter tightens from "any" to global shutter, per-stream bitrate rises from 8 Mbps to 20–40 Mbps near-lossless, and calibration upgrades from "record nominal values" to per-device K/D/R/t/b plus camera–IMU extrinsics and fixed time offset td. Only past these gates does data qualify for pretraining, mid-training, or post-training.
+
+**Evaluation (L3).** Above the training set, this adds metric depth ground truth, confidence masks, re-runnable evaluation scripts, fixed splits, and downstream measured evidence. It answers "does the model actually work?" — which is why it must be physically isolated from the training set in devices, scenes, and storage, never mixed or mutually back-filled.
+
+**The upgrade logic.** Moving up is not "add a label"; it means executing the entire higher column at once — device, calibration, synchronization, encoding, QC, and labels upgrade together. The 51 requirements fall into two blocks: acquisition with intrinsics/extrinsics (38 items) and cleaning with labeling (13 items); the two blocks stand independently and can be scheduled and accepted separately.
+
+That is why hours do not convert directly into training data: the same recording time, sitting at L0 versus L2, carries a completely different order of value. The practical point of the four-tier scheme is to separate "I have a lot of video" from "I have trainable data" — giving acquisition, cleaning, labeling, and evaluation each a concrete, quantifiable technical yardstick. In an industry that increasingly measures progress in raw hours, a shared tier definition is what lets a data provider and a model builder agree on what "trainable" actually means; the EGO-S2 four-tier recommendation is published openly as a technical starting point for that discussion, not a commercial commitment.
