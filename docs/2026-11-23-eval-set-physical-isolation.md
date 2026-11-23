@@ -1,0 +1,17 @@
+# Eval-Set Isolation: Why the Evaluation Set Must Be Physically Separated from the Training Set
+
+In embodied AI there is a recurring trap: evaluate a model on the data it trained on, report impressive numbers, then watch it fail in the field. The problem is rarely the model — it is the eval set leaking into training. In the EGO-S2 four-tier framework, the evaluation set (L3) earns its own tier not by posting higher numbers, but by honoring one deceptively simple, demanding precondition: physical isolation from the training set.
+
+The four tiers stack upward. Watchable (L0) only needs to decode and play back; material (L1) adds per-device intrinsics/extrinsics, timestamps, and IMU; trainable (L2) brings synchronization, calibration, near-lossless bitrate, QC thresholds, and labels fully into place. Evaluation (L3) goes further: metrological depth ground truth, confidence masks, re-runnable evaluation scripts, a frozen split, and downstream field-test evidence. Training answers "can the model learn"; evaluation answers "did it learn the right thing, and does it generalize." Mixing the two corrupts both answers at once.
+
+The first layer of isolation is device isolation. Data from a single device is correlated in sensor noise, distortion, mounting pose, and exposure habits. If training and evaluation share hardware, the model can memorize that device's fingerprint instead of the task itself. The evaluation batch therefore runs on independent hardware, with mounting-pose repeatability logged separately.
+
+The second layer is scene isolation. The eval set's scene list is fixed and non-overlapping with training. This is not pedantry — it prevents "seeing the exam." A model that encountered the same scenes and tasks during training proves nothing about generalization, no matter how high its score. Long-tail subsets such as seafood processing or intangible-heritage skills are scored separately precisely to measure performance on problems it has never seen.
+
+The third layer is storage isolation. Eval data is archived as a read-only frozen copy with checksums and delivered through a dedicated isolated environment. Frozen means no backfilling and no sample swapping; if leakage is ever discovered, the only remedy is to freeze and re-collect the entire batch — patching is not accepted. That rigidity is exactly what makes the score trustworthy.
+
+If isolation fails, the cost is not a few points of error — it is the collapse of the benchmark's meaning. A leaked eval set produces a score that neither the vendor nor the customer can trust, and by the time the gap between the number and field performance surfaces, the cheapest fix is to discard the batch and re-collect under a frozen protocol. For an industry only now converging on shared data standards, every leaked benchmark erodes the trust that standardization depends on.
+
+Supporting mechanisms matter as much as the walls themselves: full-frame inspection with third-party review, a fixed failure subset scored separately, evaluation scripts whose denominator can be re-derived, and acceptance based on downstream field-test pass rate rather than self-reported numbers.
+
+Isolation is not overhead — it is the precondition of evaluation credibility. EGO-S2 writes "physical isolation" into the technical specification rather than treating it as an afterthought, for a simple reason: a report card that leaks answers is more dangerous than having no report card at all.
